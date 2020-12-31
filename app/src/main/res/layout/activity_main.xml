@@ -1,16 +1,172 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <GridView
-        android:id="@+id/gridView"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/linearlayouttop"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnWidth="90dip"
-        android:gravity="center"
-        android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="10dip"
-        />
+        android:layout_height="110dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
-</RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello World Top!"/>
+
+        <Button
+            android:id="@+id/fetchbtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fetch the image"/>
+    </LinearLayout>
+    <ImageButton
+        android:id="@+id/img1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/card"
+        app:layout_constraintTop_toBottomOf="@id/linearlayouttop"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/img5"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintRight_toLeftOf="@id/img2"/>
+    <ImageButton
+        android:id="@+id/img2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/card"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintTop_toBottomOf="@id/linearlayouttop"
+        app:layout_constraintLeft_toRightOf="@id/img1"
+        app:layout_constraintBottom_toTopOf="@id/img6"
+        app:layout_constraintRight_toLeftOf="@id/img3"/>
+    <ImageButton
+        android:id="@+id/img3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/card"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintTop_toBottomOf="@id/linearlayouttop"
+        app:layout_constraintLeft_toRightOf="@id/img2"
+        app:layout_constraintBottom_toTopOf="@id/img7"
+        app:layout_constraintRight_toLeftOf="@id/img4"/>
+    <ImageButton
+        android:id="@+id/img4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/card"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintTop_toBottomOf="@id/linearlayouttop"
+        app:layout_constraintLeft_toRightOf="@id/img3"
+        app:layout_constraintBottom_toTopOf="@id/img8"
+        app:layout_constraintRight_toRightOf="parent"/>
+    <ImageButton
+        android:id="@+id/img5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/card"
+        app:layout_constraintTop_toBottomOf="@id/img1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/linearlayoutbottom"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintRight_toLeftOf="@id/img6"/>
+    <ImageButton
+        android:id="@+id/img6"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/card"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintTop_toBottomOf="@id/img2"
+        app:layout_constraintLeft_toRightOf="@id/img5"
+        app:layout_constraintBottom_toTopOf="@id/linearlayoutbottom"
+        app:layout_constraintRight_toLeftOf="@id/img7"/>
+    <ImageButton
+        android:id="@+id/img7"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/card"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintTop_toBottomOf="@id/img3"
+        app:layout_constraintLeft_toRightOf="@id/img6"
+        app:layout_constraintBottom_toTopOf="@id/linearlayoutbottom"
+        app:layout_constraintRight_toLeftOf="@id/img8"/>
+    <ImageButton
+        android:id="@+id/img8"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/card"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintTop_toBottomOf="@id/img4"
+        app:layout_constraintLeft_toRightOf="@id/img7"
+        app:layout_constraintBottom_toTopOf="@id/linearlayoutbottom"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/linearlayoutbottom"
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="314dp"
+            android:layout_height="9dp"
+            android:progress="0"
+            android:max="80"
+            android:visibility="invisible"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+
+            />
+
+        <TextView
+            android:id="@+id/progressmsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:text="Downloading 0 of 8 msg..."
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_gravity="center"
+            android:text="Pick 6 pictures to be used"
+            android:visibility="invisible" />
+
+        <Button android:id="@+id/start"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Start Game!"
+            android:layout_marginTop="40dp"
+            android:visibility="invisible"
+            android:layout_gravity="center"/>
+
+
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
