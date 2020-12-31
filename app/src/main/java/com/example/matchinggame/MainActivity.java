@@ -6,15 +6,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
 public class MainActivity extends Activity
+    implements View.OnClickListener
 {
+    //for game
+    private int WRITE_QUOTE_RESPONSE = 1;
+    private String lastQuote = "To find yourself, think for yourself.";
+
+
+    //main page
     private GridView gridView;
     private List<Map<String, Object>> dataList;
     private String[] icon = ImagesUrl.Urls;
@@ -25,6 +34,13 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //game
+        Button btn = findViewById(R.id.next);
+        if (btn != null)
+            btn.setOnClickListener((View.OnClickListener) this);
+        //game
+
+
         gridView = (GridView) findViewById(R.id.gridView);
 
         dataList = new ArrayList<Map<String, Object>>();
@@ -47,7 +63,11 @@ public class MainActivity extends Activity
             }
         });
         gridView.setAdapter(adapter);
+
+
     }
+
+
 
     private List<Map<String, Object>> getdata()
     {
@@ -57,5 +77,32 @@ public class MainActivity extends Activity
             dataList.add(map);
         }
         return dataList;
+    }
+
+
+    //copy from the demo with the button link to next page
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        if (id == R.id.next) {
+            Intent intent = new Intent(this, GameActivity.class);
+            startActivityForResult(intent, WRITE_QUOTE_RESPONSE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if (resultCode != RESULT_OK)
+            return;
+
+        if (requestCode == WRITE_QUOTE_RESPONSE) {
+            String newQuote = intent.getStringExtra("newQuote");
+            if (newQuote != null)
+                lastQuote = newQuote;
+        }
     }
 }

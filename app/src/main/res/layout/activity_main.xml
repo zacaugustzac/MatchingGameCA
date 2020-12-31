@@ -12,5 +12,19 @@
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dip"
         />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/next"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:text="Start to Play" />
+
+    </LinearLayout>
+
 
 </RelativeLayout>
