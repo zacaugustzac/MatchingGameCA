@@ -1,30 +1,26 @@
 package com.example.matchinggame;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.app.Activity;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,23 +28,43 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private Button fetchbtn;
-    private ImageButton imgbtn;
+    private ImageView imgbtn;
     private Button startbtn;
     private ProgressBar bar;
     private TextView msg;
     private TextView guide;
     private Handler handler= new Handler();
     int status=0;
-    private final int imagetotal=8;
+    private final int imagetotal=20;
+    int[]logos=new int[imagetotal];
+    private GridView simplegrid;
+    private List<Integer> imageClicked= new ArrayList<Integer>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        for(int x=0;x<20;x++){
+            logos[x]=R.drawable.card;
+        }
+        simplegrid=(GridView)findViewById(R.id.GridView);
+        CustomAdapter adapter=new CustomAdapter(getApplicationContext(),logos);
+        simplegrid.setAdapter(adapter);
+        simplegrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(),"image "+position+" is clicked!",Toast.LENGTH_SHORT).show();
+                ImageView img=view.findViewById(R.id.imageView);
+                //implemented when the image is clicked, should have some border and framed with the array
+
+            }
+        });
         fetchbtn = findViewById(R.id.fetchbtn);
         fetchbtn.setOnClickListener(this);
         startbtn=findViewById(R.id.start);
         startbtn.setOnClickListener(this);
+        bar = findViewById(R.id.progress);
+        msg = findViewById(R.id.progressmsg);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
     }
@@ -74,36 +90,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ImageFetcher im = new ImageFetcher();
             try {
                 List<String> imageurl = im.extractImage(); //all image downloaded
-                bar = findViewById(R.id.progress);
                 bar.setVisibility(View.VISIBLE);
-                msg = findViewById(R.id.progressmsg);
                 msg.setVisibility(View.VISIBLE);
-                //setProgressValue(0,im,imageurl,1);
-                new Thread(new Runnable(){
-                    @Override
-                    public void run() {
 
-                        while (status<imagetotal){
-                            status++;
-                            handler.post(new Runnable() {
-                                public void run() {
-                                    bar.setProgress(status * 10);
-                                    String mess = "Downloading " + (status) + " of "+imagetotal+" images...";
-                                    msg.setText(mess);
-                                    loadImage(im,  imageurl, status);
-                                    if(status==imagetotal){
-                                        bar.setVisibility(View.GONE);
-                                        msg.setVisibility(View.GONE);
-                                        //startbtn.setVisibility(View.VISIBLE);
-                                        guide=findViewById(R.id.guide);
-                                        guide.setVisibility(View.VISIBLE);
-                                    }
+                new Thread(() -> {
+                    while (status<imagetotal){
+                        status++;
+                        handler.post(()-> {
+                                bar.setProgress(status * 10);
+                                String mess = "Downloading " + (status) + " of "+imagetotal+" images...";
+                                msg.setText(mess);
+                                loadImage(im,  imageurl, status);
+                                if(status==imagetotal){
+                                    bar.setVisibility(View.GONE);
+                                    msg.setVisibility(View.GONE);
+                                    //startbtn.setVisibility(View.VISIBLE);
+                                    guide=findViewById(R.id.guide);
+                                    guide.setVisibility(View.VISIBLE);
                                 }
-                            });
-                            try {Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                        });
+                        try {Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                 }).start();
@@ -111,8 +119,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
-        }else if(view.getId()==R.id.img1){
-            Toast.makeText(this,"image 1 is clicked", Toast.LENGTH_SHORT).show();
+        }else if(view==simplegrid.getChildAt(0).findViewById(R.id.imageView)){
+            //imageClicked.add(0);
+            Toast.makeText(getApplicationContext(),"image 0 is clicked!",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -124,13 +133,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!file.exists()) {
             storeImageInStorage(im,imgurl,file);
         }
-        imgbtn = findViewById(getResources().getIdentifier("img" + x, "id", this.getPackageName()));
+        //imgbtn = findViewById(getResources().getIdentifier("img" + x, "id", this.getPackageName()));
+        View viewitem = simplegrid.getChildAt(x-1);
+        imgbtn=(ImageView)viewitem.findViewById(R.id.imageView);
         imgbtn.setOnClickListener(this);
 
         bar.setProgress(10*x);
         String mess="Downloading " + x + " of "+imagetotal+" images...";
         msg.setText(mess);
         imgbtn.setBackground(Drawable.createFromPath(file.toString()));
+        //imgbtn.setImageResource(Drawable.createFromPath(file.toString()));
 
     }
 }
