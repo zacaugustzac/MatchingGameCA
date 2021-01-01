@@ -12,12 +12,10 @@ import java.util.List;
 
 public class CustomAdapter extends BaseAdapter {
     Context context;
-    int logos[];
     LayoutInflater inflter;
     private List<Photo> objects = new ArrayList<Photo>();
-//    private List<Integer> imageClicked = new ArrayList<Integer>();
+
     public CustomAdapter(Context appContext, List<Photo> logos) {
-//        this.logos=logos;
         this.context = appContext;
         inflter = (LayoutInflater.from(context));
         this.objects = logos;
