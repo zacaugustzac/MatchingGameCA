@@ -1,8 +1,12 @@
 package com.example.matchinggame;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -39,6 +43,8 @@ public class GameActivity extends AppCompatActivity {
     TimerTask timerTask;
     Double time= 0.0;
 
+    AnimatorSet set;
+    ValueAnimator newtimer;
 
     boolean timerStarted =false;
 
@@ -46,7 +52,8 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
+        final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
+        final MediaPlayer wrong = MediaPlayer.create(this, R.raw.wrong);
         GridView gridView = (GridView)findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
@@ -66,17 +73,25 @@ public class GameActivity extends AppCompatActivity {
                 else{
 
                     if(currentPos == position){
-
+                        correct.start();  // if two images match, correct sound
                         ((ImageView)view).setImageResource
                                 (R.drawable.card);
+                        //Animation
+                        set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
+                        set.setTarget((ImageView) view);
+                        set.start();
                     }
 
                     else if (pos[currentPos] != pos[position]) {
-
+                        wrong.start(); // if two images mismatch, wrong sound
                         curView.setImageResource(R.drawable.card);
                         Toast.makeText(getApplicationContext(),
                                 //TODO with
                                 "No Match",Toast.LENGTH_SHORT).show();
+                        //Animation
+                        set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
+                        set.setTarget((ImageView) view);
+                        set.start();
                     }
 
                     else{
@@ -147,17 +162,15 @@ public class GameActivity extends AppCompatActivity {
 
 
     public void startStopTapped(View view) {
-        if(timerStarted ==false ){
+        if(timerStarted ==false){
             timerStarted =true;
             setButtonUI("PAUSE", R.color.red);
-
             startTimer();
 
         }
         else{
             timerStarted =false;
             setButtonUI("RESTART", R.color.green);
-
             timerTask.cancel();
         }
     }
