@@ -9,6 +9,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Handler handler = new Handler();
     int status = 0;
     private final int imagetotal = 20;
+    private final int imageselected = 6;
     int[] logos = new int[imagetotal];
     private GridView simplegrid;
     private List<Integer> imageClicked = new ArrayList<Integer>();
@@ -55,12 +57,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fetchbtn = findViewById(R.id.fetchbtn);
         fetchbtn.setOnClickListener(this);
         startbtn = findViewById(R.id.start);
-        startbtn.setOnClickListener(this);
+        startbtn.setOnClickListener((view->{
+            Intent intent= new Intent(this,GameActivity.class);
+            intent.putIntegerArrayListExtra("chosenimage",(ArrayList<Integer>)imageClicked);
+            startActivity(intent);
+
+        }));
         bar = findViewById(R.id.progress);
         msg = findViewById(R.id.progressmsg);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        System.out.println("123");
 
     }
 
@@ -77,6 +83,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+
+    public void setAdapterState(int index){
+        if(imageClicked.size()<imageselected){
+            photoList.get(index).setOppositeCheck();
+            boolean photoChecked = photoList.get(index).isPhotoChecked();
+            if (photoChecked==true){
+                imageClicked.add(index);
+                if(imageClicked.size()==imageselected){
+                    startbtn.setVisibility(View.VISIBLE);
+                    guide.setVisibility(View.GONE);
+                }
+            }else {
+                for (int i = 0; i < imageClicked.size(); i++) {
+                    if (imageClicked.get(i)==index){
+                        imageClicked.remove(i);
+                    }
+                }
+            }
+            adapter.notifyDataSetChanged();
+        }else if(imageClicked.size()==imageselected&&photoList.get(index).isPhotoChecked()) {
+            photoList.get(index).setOppositeCheck();
+            boolean photoChecked = photoList.get(index).isPhotoChecked();
+            if (photoChecked==true){
+                imageClicked.add(index);
+            }else {
+                for (int i = 0; i < imageClicked.size(); i++) {
+                    if (imageClicked.get(i)==index){
+                        imageClicked.remove(i);
+                        startbtn.setVisibility(View.GONE);
+                        guide.setVisibility(View.VISIBLE);
+
+                    }
+                }
+            }
+            adapter.notifyDataSetChanged();
+        }else {
+            Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 
     @Override
     public void onClick(View view) {
@@ -115,624 +162,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
-        } else if (view == simplegrid.getChildAt(0).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(0).setOppositeCheck();
-                boolean photoChecked = photoList.get(0).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(0);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==0){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(0).isPhotoChecked()) {
-                photoList.get(0).setOppositeCheck();
-                boolean photoChecked = photoList.get(2).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(0);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==0){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(1).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(1).setOppositeCheck();
-                boolean photoChecked = photoList.get(1).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(1);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==1){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(1).isPhotoChecked()) {
-                photoList.get(1).setOppositeCheck();
-                boolean photoChecked = photoList.get(1).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(1);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==1){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
+        }
 
-
-        } else if (view == simplegrid.getChildAt(2).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(2).setOppositeCheck();
-                boolean photoChecked = photoList.get(2).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(2);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==2){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(2).isPhotoChecked()) {
-                photoList.get(2).setOppositeCheck();
-                boolean photoChecked = photoList.get(2).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(2);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==2){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-
-
-
-        } else if (view == simplegrid.getChildAt(3).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(3).setOppositeCheck();
-                boolean photoChecked = photoList.get(3).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(3);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==3){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(3).isPhotoChecked()) {
-                photoList.get(3).setOppositeCheck();
-                boolean photoChecked = photoList.get(3).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(3);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==3){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(4).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(4).setOppositeCheck();
-                boolean photoChecked = photoList.get(4).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(4);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==4){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(4).isPhotoChecked()) {
-                photoList.get(4).setOppositeCheck();
-                boolean photoChecked = photoList.get(4).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(4);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==4){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(5).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(5).setOppositeCheck();
-                boolean photoChecked = photoList.get(5).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(5);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==5){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(5).isPhotoChecked()) {
-                photoList.get(5).setOppositeCheck();
-                boolean photoChecked = photoList.get(5).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(5);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==5){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(6).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(6).setOppositeCheck();
-                boolean photoChecked = photoList.get(6).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(6);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==6){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(6).isPhotoChecked()) {
-                photoList.get(6).setOppositeCheck();
-                boolean photoChecked = photoList.get(6).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(6);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==6){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(7).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(7).setOppositeCheck();
-                boolean photoChecked = photoList.get(7).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(7);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==7){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(7).isPhotoChecked()) {
-                photoList.get(7).setOppositeCheck();
-                boolean photoChecked = photoList.get(7).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(7);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==7){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(8).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(8).setOppositeCheck();
-                boolean photoChecked = photoList.get(8).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(8);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==8){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(8).isPhotoChecked()) {
-                photoList.get(8).setOppositeCheck();
-                boolean photoChecked = photoList.get(8).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(8);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==8){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(9).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(9).setOppositeCheck();
-                boolean photoChecked = photoList.get(9).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(9);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==9){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(9).isPhotoChecked()) {
-                photoList.get(9).setOppositeCheck();
-                boolean photoChecked = photoList.get(9).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(9);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==9){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(10).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(10).setOppositeCheck();
-                boolean photoChecked = photoList.get(10).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(10);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==10){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(10).isPhotoChecked()) {
-                photoList.get(10).setOppositeCheck();
-                boolean photoChecked = photoList.get(10).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(10);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==10){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(11).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(11).setOppositeCheck();
-                boolean photoChecked = photoList.get(11).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(11);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==11){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(11).isPhotoChecked()) {
-                photoList.get(11).setOppositeCheck();
-                boolean photoChecked = photoList.get(11).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(11);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==11){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(12).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(12).setOppositeCheck();
-                boolean photoChecked = photoList.get(12).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(12);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==12){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(12).isPhotoChecked()) {
-                photoList.get(12).setOppositeCheck();
-                boolean photoChecked = photoList.get(12).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(12);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==12){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(13).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(13).setOppositeCheck();
-                boolean photoChecked = photoList.get(13).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(13);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==13){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(13).isPhotoChecked()) {
-                photoList.get(13).setOppositeCheck();
-                boolean photoChecked = photoList.get(13).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(13);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==13){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(14).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(14).setOppositeCheck();
-                boolean photoChecked = photoList.get(14).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(14);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==14){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(14).isPhotoChecked()) {
-                photoList.get(14).setOppositeCheck();
-                boolean photoChecked = photoList.get(14).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(14);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==14){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(15).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(15).setOppositeCheck();
-                boolean photoChecked = photoList.get(15).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(15);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==15){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(15).isPhotoChecked()) {
-                photoList.get(15).setOppositeCheck();
-                boolean photoChecked = photoList.get(15).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(15);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==15){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(16).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(16).setOppositeCheck();
-                boolean photoChecked = photoList.get(16).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(16);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==16){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(16).isPhotoChecked()) {
-                photoList.get(16).setOppositeCheck();
-                boolean photoChecked = photoList.get(16).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(16);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==16){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(17).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(17).setOppositeCheck();
-                boolean photoChecked = photoList.get(17).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(17);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==17){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(17).isPhotoChecked()) {
-                photoList.get(17).setOppositeCheck();
-                boolean photoChecked = photoList.get(17).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(17);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==17){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(18).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(18).setOppositeCheck();
-                boolean photoChecked = photoList.get(18).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(18);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==18){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(18).isPhotoChecked()) {
-                photoList.get(18).setOppositeCheck();
-                boolean photoChecked = photoList.get(18).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(18);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==18){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
-            }
-        } else if (view == simplegrid.getChildAt(19).findViewById(R.id.imageView)) {
-            if(imageClicked.size()<6){
-                photoList.get(19).setOppositeCheck();
-                boolean photoChecked = photoList.get(19).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(19);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==19){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else if(imageClicked.size()==6&&photoList.get(19).isPhotoChecked()) {
-                photoList.get(19).setOppositeCheck();
-                boolean photoChecked = photoList.get(19).isPhotoChecked();
-                if (photoChecked==true){
-                    imageClicked.add(19);
-                }else {
-                    for (int i = 0; i < imageClicked.size(); i++) {
-                        if (imageClicked.get(i)==19){
-                            imageClicked.remove(i);
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }else {
-                Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
+        //assign every button click function to update the state of app for having only 6 images
+        for(int x=0;x<imagetotal;x++){
+            if(view==simplegrid.getChildAt(x).findViewById(R.id.imageView)){
+                setAdapterState(x);
             }
         }
     }
-
-    private void setListener(CustomAdapter adapter, int index) {
-        simplegrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                photoList.get(index).setOppositeCheck();
-                adapter.notifyDataSetChanged();
-            }
-        });
-    }
-
 
     private void loadImage(ImageFetcher im, List<String> imageurl, int x) {
         String imgurl = imageurl.get(x - 1);
@@ -742,7 +180,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!file.exists()) {
             storeImageInStorage(im, imgurl, file);
         }
-        //imgbtn = findViewById(getResources().getIdentifier("img" + x, "id", this.getPackageName()));
         View viewitem = simplegrid.getChildAt(x - 1);
         imgbtn = (ImageView) viewitem.findViewById(R.id.imageView);
         imgbtn.setOnClickListener(this);
@@ -759,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void getPhotoData() {
 
         photoList = new ArrayList<Photo>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < imagetotal; i++) {
             Photo photo = new Photo(logos[i], false);
             photoList.add(photo);
         }
