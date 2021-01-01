@@ -1,30 +1,94 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<?xml version="1.0" encoding="utf-8"?>
 
-    <GridView
-        android:id="@+id/gridView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnWidth="90dip"
-        android:gravity="center"
-        android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="10dip"
-        />
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
     <LinearLayout
+        android:id="@+id/linearlayouttop"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
-        android:orientation="horizontal">
+        android:layout_height="110dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Later need to be replaced by the user input field!"/>
 
         <Button
-            android:id="@+id/next"
-            android:layout_width="128dp"
-            android:layout_height="128dp"
-            android:text="Start to Play" />
+            android:id="@+id/fetchbtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fetch"/>
+    </LinearLayout>
+
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/GridView"
+        android:padding="1dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/linearlayoutbottom"
+        app:layout_constraintTop_toBottomOf="@id/linearlayouttop"
+        app:layout_constraintRight_toRightOf="parent"
+        android:numColumns="4"/>
+
+    <LinearLayout
+        android:id="@+id/linearlayoutbottom"
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="314dp"
+            android:layout_height="9dp"
+            android:progress="0"
+            android:max="200"
+            android:visibility="invisible"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+
+            />
+
+        <TextView
+            android:id="@+id/progressmsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:text="@string/progressmessage"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_gravity="center"
+            android:text="@string/instructions"
+            android:visibility="invisible" />
+
+        <Button android:id="@+id/start"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/start"
+            android:layout_marginTop="40dp"
+            android:visibility="invisible"
+            android:layout_gravity="center"/>
+
+
 
     </LinearLayout>
 
 
-</RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
