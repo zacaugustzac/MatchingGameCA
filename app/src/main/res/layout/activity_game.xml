@@ -13,6 +13,15 @@
         android:layout_height="wrap_content"
         android:background="@null">
 
+        <Button
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BACK"
+            android:background="@null"
+            android:textColor="@color/purple_700"
+            android:textSize="20sp"
+            android:onClick="back"/>
 
         <Button
             android:id="@+id/restTapped"
@@ -67,9 +76,12 @@
 
     </LinearLayout>
 
-    <include
-        layout="@layout/images"
+    <GridView
+        android:id="@+id/GridView"
         android:layout_width="wrap_content"
-        android:layout_height="500dp"
-        android:layout_centerInParent="true" />
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="10dp"
+        android:verticalSpacing="10dp"
+        android:numColumns="3"
+        />
 </LinearLayout>

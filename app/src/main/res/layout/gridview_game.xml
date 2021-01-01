@@ -13,13 +13,5 @@
         android:background="@drawable/card"
         />
 
-    <ImageView
-        android:id="@+id/check"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_gravity="right|bottom"
-        android:layout_marginBottom="4dp"
-        android:layout_marginRight="4dp"
-        android:src="@drawable/non_selected" />
 
 </RelativeLayout>

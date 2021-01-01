@@ -1,15 +1,23 @@
 package com.example.matchinggame;
 
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,6 +26,14 @@ public class GameActivity extends AppCompatActivity {
 
     TextView timerText;
     Button stopStartButton;
+    GridView GridView;
+    ImageView curView = null;
+    private int countPair = 0;
+    int card[] ={R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card,
+            R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card,
+            R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card} ;
+    int[] pos = {0,1,2,3,4,5,6,0,1,2,3,4,5,6};
+    int currentPos = -1;
 
     Timer timer;
     TimerTask timerTask;
@@ -31,10 +47,72 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        GridView gridView = (GridView)findViewById(R.id.GridView);
+        ImageAdapter imageAdapter = new ImageAdapter(this);
+        gridView.setAdapter(imageAdapter);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(currentPos <0){
+
+                    currentPos = position;
+                    curView = (ImageView)view;
+                    ((ImageView)view).setImageResource
+                            (card[pos[position]]);
+
+                }
+
+                else{
+
+                    if(currentPos == position){
+
+                        ((ImageView)view).setImageResource
+                                (R.drawable.card);
+                    }
+
+                    else if (pos[currentPos] != pos[position]) {
+
+                        curView.setImageResource(R.drawable.card);
+                        Toast.makeText(getApplicationContext(),
+                                //TODO with
+                                "No Match",Toast.LENGTH_SHORT).show();
+                    }
+
+                    else{
+
+                        ((ImageView)view).setImageResource
+                                (card[pos[position]]);
+
+                        countPair++;
+
+                        if(countPair == 6){
+
+                            Toast.makeText(getApplicationContext(),
+                                    "You have Won",Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    }
+
+                    currentPos = -1;
+
+                }
+            }
+        });
+
+
+
         timerText =(TextView) findViewById(R.id.timerText);
         stopStartButton=(Button)findViewById(R.id.startStopButton);
 
         timer = new Timer();
+    }
+
+
+    public void back(View view){
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
     }
 
 
