@@ -7,35 +7,68 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CustomAdapter extends BaseAdapter {
     Context context;
     int logos[];
     LayoutInflater inflter;
-    public CustomAdapter(Context appContext, int[]logos){
-        this.logos=logos;
-        this.context=appContext;
-        inflter=(LayoutInflater.from(context));
-    }
-    @Override
-    public int getCount() {
-        return logos.length;
+    private List<Photo> objects = new ArrayList<Photo>();
+//    private List<Integer> imageClicked = new ArrayList<Integer>();
+    public CustomAdapter(Context appContext, List<Photo> logos) {
+//        this.logos=logos;
+        this.context = appContext;
+        inflter = (LayoutInflater.from(context));
+        this.objects = logos;
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
+    public int getCount() {
+        return objects.size();
+    }
+
+    @Override
+    public Photo getItem(int position) {
+        return objects.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        convertView=inflter.inflate(R.layout.gridview_item,null);
-        ImageView icon=convertView.findViewById(R.id.imageView);
-        icon.setBackgroundResource(logos[position]);
+        ViewHolder viewHolder = null;
+
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.gridview_item, null);
+            viewHolder = new ViewHolder();
+
+            viewHolder.photos = (ImageView) convertView.findViewById(R.id.imageView);
+
+            viewHolder.check = (ImageView) convertView.findViewById(R.id.check);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+
+        }
+
+        viewHolder.photos.setImageResource(getItem(position).getPhotoId());
+        if (getItem(position).isPhotoChecked()) {
+            viewHolder.check.setImageResource(R.drawable.selected);
+        }
+
+        else {
+            viewHolder.check.setImageResource(R.drawable.non_selected);
+        }
         return convertView;
     }
+
+    protected class ViewHolder {
+        ImageView photos;
+        ImageView check;
+    }
 }
+
