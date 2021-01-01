@@ -1,6 +1,7 @@
 package com.example.matchinggame;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -41,6 +42,7 @@ public class ImageAdapter extends BaseAdapter {
         ImageView imageView;
         if (convertView == null)
         {
+            convertView = LayoutInflater.from(context).inflate(R.layout.gridview_item, null);
             imageView = new ImageView(this.context);
             imageView.setLayoutParams(new GridView.LayoutParams(300,350));
 
