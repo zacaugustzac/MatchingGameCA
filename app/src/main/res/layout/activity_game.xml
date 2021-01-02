@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:paddingBottom="16dp"
     android:paddingLeft="16dp"
@@ -84,4 +85,11 @@
         android:verticalSpacing="10dp"
         android:numColumns="3"
         />
+
+    <ImageView
+        android:id="@+id/imageViewHz"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@drawable/default_image" />
+
 </LinearLayout>
