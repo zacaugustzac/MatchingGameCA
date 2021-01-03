@@ -32,7 +32,7 @@ public class GameActivity extends AppCompatActivity {
 
     TextView timerText;
     Button stopStartButton;
-    GridView GridView;
+    GridView gridView;
     ImageView curView = null;
     private int countPair = 0;
     int card[] ={R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card,
@@ -59,7 +59,7 @@ public class GameActivity extends AppCompatActivity {
         final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
         final MediaPlayer wrong = MediaPlayer.create(this, R.raw.wrong);
         final MediaPlayer count = MediaPlayer.create(this, R.raw.countdown);
-        GridView gridView = (GridView)findViewById(R.id.GridView);
+        gridView = findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
 
@@ -128,8 +128,8 @@ public class GameActivity extends AppCompatActivity {
 
         timer = new Timer();
 
+        //the countdown feature
         mTextField=findViewById(R.id.countdown);
-
         new CountDownTimer(4000, 1000) {
 
             public void onTick(long millisUntilFinished) {
@@ -163,11 +163,15 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 if(timerTask != null){
-                    timerTask.cancel();
-                    setButtonUI("START", R.color.green);
-                    time = 0.0;
-                    timerStarted = false;
-                    timerText.setText(formatTime(0,0,0));
+                    finish();
+                    //TODO:probably the get intent need to be modify?
+                    startActivity(getIntent());
+                    //comment the sentence below (unsure if above work perfectly)
+//                    timerTask.cancel();
+//                    setButtonUI("START", R.color.green);
+//                    time = 0.0;
+//                    timerStarted = false;
+//                    timerText.setText(formatTime(0,0,0));
                 }
 
             }
@@ -189,16 +193,16 @@ public class GameActivity extends AppCompatActivity {
         if(timerStarted ==false){
             timerStarted =true;
             setButtonUI("PAUSE", R.color.red);
-          //  GridView.setVisibility(View.VISIBLE);
-            GridView.setEnabled(true);
+            //GridView.setEnabled(true);
+            gridView.setEnabled(true);
             startTimer();
 
         }
         else{
             timerStarted =false;
             setButtonUI("RESTART", R.color.green);
-          //  GridView.setVisibility(View.INVISIBLE);
-            GridView.setEnabled(false);
+            //GridView.setEnabled(false);
+            gridView.setEnabled(false);
             timerTask.cancel();
         }
     }
@@ -210,7 +214,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void startTimer()
-    {   GridView.setVisibility(View.VISIBLE);
+    {   //GridView.setVisibility(View.VISIBLE);
         timerTask = new TimerTask() {
             @Override
             public void run() {

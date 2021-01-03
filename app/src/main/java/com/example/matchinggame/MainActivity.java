@@ -146,13 +146,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if (status == imagetotal) {
                                 bar.setVisibility(View.GONE);
                                 msg.setVisibility(View.GONE);
-                                //startbtn.setVisibility(View.VISIBLE);
                                 guide = findViewById(R.id.guide);
                                 guide.setVisibility(View.VISIBLE);
                             }
                         });
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -188,7 +187,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String mess = "Downloading " + x + " of " + imagetotal + " images...";
         msg.setText(mess);
         imgbtn.setBackground(Drawable.createFromPath(file.toString()));
-        //imgbtn.setImageResource(Drawable.createFromPath(file.toString()));
 
     }
 
