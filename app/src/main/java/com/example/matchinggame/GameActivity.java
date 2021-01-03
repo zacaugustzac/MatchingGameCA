@@ -63,8 +63,24 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        //shuffle answer
         answer = shuffle(answer);
 
+        //get intent get chosen images
+        Intent intent = getIntent();
+        ArrayList<Integer> chosenImagesArr = intent.getIntegerArrayListExtra("chosenimage");
+
+        //get 6 images
+        int x = chosenImagesArr.get(1);
+        ArrayList<Bitmap> chosenImages = new ArrayList<>();
+        for (int i=0; i<chosenImagesArr.size(); i++){
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
+            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+            File file = new File(directory, "image"+chosenImagesArr.get(i)+"jpg");
+            chosenImages.add((((BitmapDrawable)Drawable.createFromPath((file.toString()))).getBitmap()));
+        }
+
+        //GridView
         GridView gridView = (GridView)findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
@@ -220,14 +236,14 @@ public class GameActivity extends AppCompatActivity {
 //    }
 
     public void setImageToAnswer(Integer[] answer, List<Photo> photoList){
-
     }
 
     public void flip(View v){
-        ImageView imageView = (ImageView)v;
-        Bitmap current = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
-        Drawable defDrawable = getResources().getDrawable(R.drawable.default_image,null);
+        ImageView imageView = (ImageView)v; //convert to imageview
+        Bitmap current = ((BitmapDrawable)imageView.getDrawable()).getBitmap(); //get current picture bitmap
+        Drawable defDrawable = getResources().getDrawable(R.drawable.default_image,null); //get default picture bitmap
         Bitmap def = ((BitmapDrawable)defDrawable).getBitmap();
+        //compare - if default change to picture, else change to default
         if(current == def) {
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
