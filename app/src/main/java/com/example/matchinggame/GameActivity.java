@@ -4,8 +4,13 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -22,7 +27,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,10 +60,30 @@ public class GameActivity extends AppCompatActivity {
 
     TextView mTextField;
 
+    Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
+    ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
+    ArrayList<Bitmap> chosenImages = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        //shuffle answer
+        answer = shuffle(answer);
+
+        //get intent get chosen images
+        Intent intent = getIntent();
+        chosenImagesArr = intent.getIntegerArrayListExtra("chosenimage");
+
+        //get 6 images in to ArrayList<Bitmap> chosenImages
+        for (int i=0; i<chosenImagesArr.size(); i++){
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
+            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+            File file = new File(directory, "image"+(chosenImagesArr.get(i)+1)+".jpg");
+            chosenImages.add( ( (BitmapDrawable)Drawable.createFromPath( file.toString() ) ).getBitmap());
+        }
+
         final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
         final MediaPlayer wrong = MediaPlayer.create(this, R.raw.wrong);
         final MediaPlayer count = MediaPlayer.create(this, R.raw.countdown);
@@ -128,6 +156,8 @@ public class GameActivity extends AppCompatActivity {
 
         timer = new Timer();
 
+
+
         //the countdown feature
         mTextField=findViewById(R.id.countdown);
         new CountDownTimer(4000, 1000) {
@@ -147,7 +177,29 @@ public class GameActivity extends AppCompatActivity {
             }
         }.start();
     }
+    //to shuffle the answer
+    public Integer[] shuffle(Integer[] intArray){
+        List<Integer> intList = Arrays.asList(intArray);
+        Collections.shuffle(intList);
+        return intList.toArray(intArray);
+    }
 
+    //to change default card to image behind the answer, work in progress
+    public void flip(View v){
+        ImageView imageView = (ImageView)v; //convert to imageview
+        Bitmap current = ((BitmapDrawable)imageView.getDrawable()).getBitmap(); //get current picture bitmap
+        Drawable defDrawable = getResources().getDrawable(R.drawable.default_image,null); //get default picture bitmap
+        Bitmap def = ((BitmapDrawable)defDrawable).getBitmap();
+        //compare - if default change to picture, else change to default
+        if(current == def) {
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
+            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+            File file = new File(directory, "image9.jpg");
+            imageView.setImageDrawable(Drawable.createFromPath((file.toString())));
+        } else {
+            imageView.setImageDrawable(getResources().getDrawable(R.drawable.default_image,null));
+        }
+    }
 
     public void back(View view){
         Intent intent = new Intent(this,MainActivity.class);
