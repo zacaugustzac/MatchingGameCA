@@ -223,9 +223,15 @@ public class GameActivity extends AppCompatActivity {
 
     public void flip(View v){
         ImageView imageView = (ImageView)v;
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        File file = new File(directory, "image9.jpg");
-        imageView.setImageDrawable(Drawable.createFromPath((file.toString())));
+        Drawable current = imageView.getDrawable();
+        Drawable def = getResources().getDrawable(R.drawable.default_image,null);
+        if(current == def) {
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
+            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+            File file = new File(directory, "image9.jpg");
+            imageView.setImageDrawable(Drawable.createFromPath((file.toString())));
+        } else {
+
+        }
     }
 }
