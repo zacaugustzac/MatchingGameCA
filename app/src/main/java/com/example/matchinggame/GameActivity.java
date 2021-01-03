@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
@@ -223,15 +225,17 @@ public class GameActivity extends AppCompatActivity {
 
     public void flip(View v){
         ImageView imageView = (ImageView)v;
-        Drawable current = imageView.getDrawable();
-        Drawable def = getResources().getDrawable(R.drawable.default_image,null);
+        Bitmap current = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+        Drawable defDrawable = getResources().getDrawable(R.drawable.default_image,null);
+        Bitmap def = ((BitmapDrawable)defDrawable).getBitmap();
         if(current == def) {
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
             File file = new File(directory, "image9.jpg");
             imageView.setImageDrawable(Drawable.createFromPath((file.toString())));
         } else {
-
+            imageView.setImageDrawable(getResources().getDrawable(R.drawable.default_image,null));
+//            Toast.makeText(getApplicationContext(), "mismatch", Toast.LENGTH_SHORT).show();
         }
     }
 }
