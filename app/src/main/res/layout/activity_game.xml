@@ -6,7 +6,8 @@
     android:paddingRight="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:descendantFocusability="blocksDescendants">
 
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
@@ -40,8 +41,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@null"
-            android:onClick="startStopTapped"
             android:text="START"
+            android:onClick="startStopTapped"
             android:textColor="@color/green"
             android:textSize="30sp" />
 
@@ -83,5 +84,5 @@
         android:horizontalSpacing="10dp"
         android:verticalSpacing="10dp"
         android:numColumns="3"
-        />
+        android:descendantFocusability="blocksDescendants"/>
 </LinearLayout>

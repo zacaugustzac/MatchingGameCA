@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
@@ -54,11 +55,11 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
         final MediaPlayer wrong = MediaPlayer.create(this, R.raw.wrong);
-        GridView gridView = (GridView)findViewById(R.id.GridView);
+        GridView = (GridView)findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
-        gridView.setAdapter(imageAdapter);
+        GridView.setAdapter(imageAdapter);
 
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        GridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(currentPos <0){
@@ -122,8 +123,9 @@ public class GameActivity extends AppCompatActivity {
         stopStartButton=(Button)findViewById(R.id.startStopButton);
 
         timer = new Timer();
-    }
 
+
+    }
 
     public void back(View view){
         Intent intent = new Intent(this,MainActivity.class);
@@ -160,17 +162,20 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-
     public void startStopTapped(View view) {
         if(timerStarted ==false){
             timerStarted =true;
             setButtonUI("PAUSE", R.color.red);
+          //  GridView.setVisibility(View.VISIBLE);
+            GridView.setEnabled(true);
             startTimer();
 
         }
         else{
             timerStarted =false;
             setButtonUI("RESTART", R.color.green);
+          //  GridView.setVisibility(View.INVISIBLE);
+            GridView.setEnabled(false);
             timerTask.cancel();
         }
     }
