@@ -45,7 +45,6 @@ public class GameActivity extends AppCompatActivity {
     Double time= 0.0;
 
     AnimatorSet set;
-    ValueAnimator newtimer;
 
     boolean timerStarted =false;
 
@@ -58,6 +57,7 @@ public class GameActivity extends AppCompatActivity {
         GridView = (GridView)findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
         GridView.setAdapter(imageAdapter);
+        GridView.setVisibility(View.INVISIBLE);
 
         GridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -187,7 +187,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void startTimer()
-    {
+    {   GridView.setVisibility(View.VISIBLE);
         timerTask = new TimerTask() {
             @Override
             public void run() {
