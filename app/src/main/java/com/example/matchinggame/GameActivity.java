@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -48,12 +49,15 @@ public class GameActivity extends AppCompatActivity {
 
     boolean timerStarted =false;
 
+    TextView mTextField;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
         final MediaPlayer wrong = MediaPlayer.create(this, R.raw.wrong);
+        final MediaPlayer count = MediaPlayer.create(this, R.raw.countdown);
         GridView gridView = (GridView)findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
@@ -122,6 +126,25 @@ public class GameActivity extends AppCompatActivity {
         stopStartButton=(Button)findViewById(R.id.startStopButton);
 
         timer = new Timer();
+
+        mTextField=findViewById(R.id.countdown);
+
+        new CountDownTimer(4000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                count.start();
+                if((millisUntilFinished)<1000){
+                    mTextField.setText("START");
+                }else{
+                    mTextField.setText(""+(millisUntilFinished) / 1000);
+                }
+            }
+
+            public void onFinish() {
+                startStopTapped(findViewById(R.id.startStopButton));
+                mTextField.setVisibility(View.GONE);
+            }
+        }.start();
     }
 
 
