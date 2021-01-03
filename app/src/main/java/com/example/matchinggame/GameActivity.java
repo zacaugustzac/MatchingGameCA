@@ -165,14 +165,14 @@ public class GameActivity extends AppCompatActivity {
             }
         }.start();
 
-        //zac test
-        ImageView imageViewHz = findViewById(R.id.imageViewHz);
-        imageViewHz.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                flip(v);
-            }
-        });
+//        //zac test
+//        ImageView imageViewHz = findViewById(R.id.imageViewHz);
+//        imageViewHz.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                flip(v);
+//            }
+//        });
 
 
     }
