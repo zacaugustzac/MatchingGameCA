@@ -55,6 +55,8 @@ public class GameActivity extends AppCompatActivity {
     Double time= 0.0;
 
     Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5};
+    ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
+    ArrayList<Bitmap> chosenImages = new ArrayList<>();
 
     boolean timerStarted =false;
 
@@ -68,16 +70,15 @@ public class GameActivity extends AppCompatActivity {
 
         //get intent get chosen images
         Intent intent = getIntent();
-        ArrayList<Integer> chosenImagesArr = intent.getIntegerArrayListExtra("chosenimage");
+        chosenImagesArr = intent.getIntegerArrayListExtra("chosenimage");
 
         //get 6 images
-        int x = chosenImagesArr.get(1);
-        ArrayList<Bitmap> chosenImages = new ArrayList<>();
+//        ArrayList<Bitmap> chosenImages = new ArrayList<>();
         for (int i=0; i<chosenImagesArr.size(); i++){
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-            File file = new File(directory, "image"+chosenImagesArr.get(i)+"jpg");
-            chosenImages.add((((BitmapDrawable)Drawable.createFromPath((file.toString()))).getBitmap()));
+            File file = new File(directory, "image"+(chosenImagesArr.get(i)+1)+".jpg");
+            chosenImages.add( ( (BitmapDrawable)Drawable.createFromPath( file.toString() ) ).getBitmap());
         }
 
         //GridView
