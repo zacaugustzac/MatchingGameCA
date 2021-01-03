@@ -1,5 +1,8 @@
 package com.example.matchinggame;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -8,8 +11,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
@@ -41,7 +47,7 @@ public class GameActivity extends AppCompatActivity {
 
     TextView timerText;
     Button stopStartButton;
-    GridView GridView;
+    GridView gridView;
     ImageView curView = null;
     private int countPair = 0;
     int card[] ={R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card,
@@ -57,8 +63,12 @@ public class GameActivity extends AppCompatActivity {
     Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5};
     ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
     ArrayList<Bitmap> chosenImages = new ArrayList<>();
+    AnimatorSet set;
+    ValueAnimator newtimer;
 
     boolean timerStarted =false;
+
+    TextView mTextField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +93,10 @@ public class GameActivity extends AppCompatActivity {
 
         //GridView
         GridView gridView = (GridView)findViewById(R.id.GridView);
+        final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
+        final MediaPlayer wrong = MediaPlayer.create(this, R.raw.wrong);
+        final MediaPlayer count = MediaPlayer.create(this, R.raw.countdown);
+        gridView = findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -96,14 +110,24 @@ public class GameActivity extends AppCompatActivity {
                 }
                 else{
                     if(currentPos == position){
+                        correct.start();  // if two images match, correct sound
                         ((ImageView)view).setImageResource
                                 (R.drawable.card);
+                        //Animation
+                        set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
+                        set.setTarget((ImageView) view);
+                        set.start();
                     }
                     else if (pos[currentPos] != pos[position]) {
+                        wrong.start(); // if two images mismatch, wrong sound
                         curView.setImageResource(R.drawable.card);
                         Toast.makeText(getApplicationContext(),
                                 //TODO with
                                 "No Match",Toast.LENGTH_SHORT).show();
+                        //Animation
+                        set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
+                        set.setTarget((ImageView) view);
+                        set.start();
                     }
                     else{
                         ((ImageView)view).setImageResource
@@ -121,6 +145,25 @@ public class GameActivity extends AppCompatActivity {
         timerText =(TextView) findViewById(R.id.timerText);
         stopStartButton=(Button)findViewById(R.id.startStopButton);
         timer = new Timer();
+
+        //the countdown feature
+        mTextField=findViewById(R.id.countdown);
+        new CountDownTimer(4000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                count.start();
+                if((millisUntilFinished)<1000){
+                    mTextField.setText("START");
+                }else{
+                    mTextField.setText(""+(millisUntilFinished) / 1000);
+                }
+            }
+
+            public void onFinish() {
+                startStopTapped(findViewById(R.id.startStopButton));
+                mTextField.setVisibility(View.GONE);
+            }
+        }.start();
 
         //zac test
         ImageView imageViewHz = findViewById(R.id.imageViewHz);
@@ -149,11 +192,15 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 if(timerTask != null){
-                    timerTask.cancel();
-                    setButtonUI("START", R.color.green);
-                    time = 0.0;
-                    timerStarted = false;
-                    timerText.setText(formatTime(0,0,0));
+                    finish();
+                    //TODO:probably the get intent need to be modify?
+                    startActivity(getIntent());
+                    //comment the sentence below (unsure if above work perfectly)
+//                    timerTask.cancel();
+//                    setButtonUI("START", R.color.green);
+//                    time = 0.0;
+//                    timerStarted = false;
+//                    timerText.setText(formatTime(0,0,0));
                 }
             }
         });
@@ -171,17 +218,19 @@ public class GameActivity extends AppCompatActivity {
 
 
     public void startStopTapped(View view) {
-        if(timerStarted ==false ){
+        if(timerStarted ==false){
             timerStarted =true;
             setButtonUI("PAUSE", R.color.red);
-
+            //GridView.setEnabled(true);
+            gridView.setEnabled(true);
             startTimer();
 
         }
         else{
             timerStarted =false;
             setButtonUI("RESTART", R.color.green);
-
+            //GridView.setEnabled(false);
+            gridView.setEnabled(false);
             timerTask.cancel();
         }
     }
@@ -193,7 +242,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void startTimer()
-    {
+    {   //GridView.setVisibility(View.VISIBLE);
         timerTask = new TimerTask() {
             @Override
             public void run() {
