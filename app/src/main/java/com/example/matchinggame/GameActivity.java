@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
@@ -188,12 +189,16 @@ public class GameActivity extends AppCompatActivity {
         if(timerStarted ==false){
             timerStarted =true;
             setButtonUI("PAUSE", R.color.red);
+          //  GridView.setVisibility(View.VISIBLE);
+            GridView.setEnabled(true);
             startTimer();
 
         }
         else{
             timerStarted =false;
             setButtonUI("RESTART", R.color.green);
+          //  GridView.setVisibility(View.INVISIBLE);
+            GridView.setEnabled(false);
             timerTask.cancel();
         }
     }
@@ -205,7 +210,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void startTimer()
-    {
+    {   GridView.setVisibility(View.VISIBLE);
         timerTask = new TimerTask() {
             @Override
             public void run() {
