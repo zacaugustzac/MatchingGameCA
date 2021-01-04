@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.hardware.input.InputManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -49,7 +50,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Photo> photoList;
     private CustomAdapter adapter;
     EditText enterUrl;
-
+    private ImageView check;
+    private boolean status_thread=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,64 +133,101 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private class MyTask extends AsyncTask<String, Integer, String> {
+        String url = "https://stocksnap.io/search/cars";
+        @Override
+        protected String doInBackground(String... strings) {
+            closeKeyboard();
+            if (url.equals("")) {
+                Toast.makeText(MainActivity.this, "You did not enter a url", Toast.LENGTH_SHORT).show();
+            }
+            ImageFetcher im = new ImageFetcher(url);
+            try {
+
+                List<String> imageurl = im.extractImage();
+//
+                while (status < imagetotal) {
+                    status++;
+
+                    handler.post(() -> {
+                        publishProgress(status * 10);
+                        loadImage(im, imageurl, status);
+                        if (status == imagetotal) {
+                            bar.setVisibility(View.GONE);
+                            msg.setVisibility(View.GONE);
+                            guide = findViewById(R.id.guide);
+                            guide.setVisibility(View.VISIBLE);
+
+                        }
+
+                    });
+
+                    Thread.sleep(500);
+                }
+            } catch (MalformedURLException | InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            bar.setVisibility(View.VISIBLE);
+            msg.setVisibility(View.VISIBLE);
+
+            msg.setText("Loading");
+            // 执行前显示提示
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progresses) {
+
+            bar.setProgress(progresses[0]);
+            String mess = "Downloading " + (status) + " of " + imagetotal + " images...";
+            msg.setText(mess);
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            msg.setText("Loading Completed");
+            status_thread=true;
+
+        }
+        @Override
+        protected void onCancelled() {
+
+//            msg.setText("已取消");
+//            bar.setProgress(0);
+
+        }
+    }
 
 
     @Override
     public void onClick(View view) {
 
-        String url = enterUrl.getText().toString();
 
-        if (view == fetchbtn) {
-            closeKeyboard();
-            if (url.equals("")) {
-                Toast.makeText(this, "You did not enter a url", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            ImageFetcher im = new ImageFetcher(url);
-            try {
-                List<String> imageurl = im.extractImage();
-                if(imageurl==null){
-                    Toast.makeText(this, "Invalid url", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                bar.setVisibility(View.VISIBLE);
-                msg.setVisibility(View.VISIBLE);
-                Thread thr = new Thread(() -> {
-                    status = 0;
-                    while (status < imagetotal) {
-                        status++;
-                        handler.post(() -> {
-                            bar.setProgress(status * 10);
-                            String mess = "Downloading " + (status) + " of " + imagetotal + " images...";
-                            msg.setText(mess);
-                            loadImage(im, imageurl, status);
-                            if (status == imagetotal) {
-                                bar.setVisibility(View.GONE);
-                                msg.setVisibility(View.GONE);
-                                guide = findViewById(R.id.guide);
-                                guide.setVisibility(View.VISIBLE);
-                            }
-                        });
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                thr.start();
+        if (view==fetchbtn){
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            MyTask myTask=new MyTask();
+            myTask.execute();
+
         }
         else {
             //assign every button click function to update the state of app for having only 6 images
-            for (int x = 0; x < imagetotal; x++) {
-                if (view == simplegrid.getChildAt(x).findViewById(R.id.imageView)) {
-                    setAdapterState(x);
+
+            if (status_thread==true){
+
+                for (int x = 0; x < imagetotal; x++) {
+                    if (view == simplegrid.getChildAt(x).findViewById(R.id.imageView)) {
+                        setAdapterState(x);
+                    }
                 }
             }
+
+
         }
     }
 
