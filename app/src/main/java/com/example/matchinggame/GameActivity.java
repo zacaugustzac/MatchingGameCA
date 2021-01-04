@@ -61,7 +61,9 @@ public class GameActivity extends AppCompatActivity {
 
     Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
     ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
-    ArrayList<Bitmap> chosenImages = new ArrayList<>();
+//    ArrayList<Bitmap> chosenImagesBitmap = new ArrayList<>();
+    ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
+    ArrayList<Drawable> answerDrawable = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,17 +73,26 @@ public class GameActivity extends AppCompatActivity {
         //shuffle answer
         answer = shuffle(answer);
 
-        //get intent get chosen images
+        //get intent get chosen images arr from MainActivity
         Intent intent = getIntent();
         chosenImagesArr = intent.getIntegerArrayListExtra("chosenimage");
 
-        //get 6 images in to ArrayList<Bitmap> chosenImages
+        //prepare chosenImageDrawable (get 6 images in to ArrayList<Bitmap> chosenImagesDrawable)
         for (int i=0; i<chosenImagesArr.size(); i++){
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
             File file = new File(directory, "image"+(chosenImagesArr.get(i)+1)+".jpg");
-            chosenImages.add( ( (BitmapDrawable)Drawable.createFromPath( file.toString() ) ).getBitmap());
+//            chosenImages.add( ( (BitmapDrawable)Drawable.createFromPath( file.toString() ) ).getBitmap());
+            chosenImagesDrawable.add(Drawable.createFromPath( file.toString() ));
         }
+
+        //prepare answerDrawable
+        for (int i=0; i<answer.length ; i++){
+            answerDrawable.add(chosenImagesDrawable.get(answer[i]));
+        }
+
+
+        //get 6
 
         final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
         final MediaPlayer wrong = MediaPlayer.create(this, R.raw.wrong);
@@ -93,17 +104,15 @@ public class GameActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ((ImageView)view).setImageDrawable(answerDrawable.get(position));
                 if(currentPos <0){
-
                     currentPos = position;
                     curView = (ImageView)view;
-                    ((ImageView)view).setImageResource
-                            (card[pos[position]]);
-
+//                    ((ImageView)view).setImageResource
+//                            (card[pos[position]]);
+//                    ((ImageView)view).setImageDrawable(chosenImagesDrawable.get(position));
                 }
-
                 else{
-
                     if(currentPos == position){
                         correct.start();  // if two images match, correct sound
                         ((ImageView)view).setImageResource
