@@ -132,6 +132,9 @@ public class GameActivity extends AppCompatActivity {
 
                     chosenPosition.clear();
                     chosenPosition.add(position);
+
+                    //to cover case where 3rd item is one of the first 2 items
+                    ((ImageView)view).setImageDrawable(answerDrawable.get(position));
                 }
 
                 //if clicked second item
