@@ -22,10 +22,10 @@ public class ImageFetcher {
         this.linkurl=url;
     }
 
-    public ImageFetcher(){
+    //public ImageFetcher(){
         //linkurl="https://stocksnap.io/search/celebration+party+fireworks";
-        linkurl="https://stocksnap.io/search/cars";
-    }
+        //linkurl="https://stocksnap.io/search/cars";
+    //}
 
     public List<String> extractImage() throws MalformedURLException {
         URL url;

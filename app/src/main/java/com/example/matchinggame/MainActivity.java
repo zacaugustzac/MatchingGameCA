@@ -7,18 +7,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -35,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView msg;
     private TextView guide;
     private Handler handler = new Handler();
-    int status = 0;
+    int status;
     private final int imagetotal = 20;
     private final int imageselected = 6;
     int[] logos = new int[imagetotal];
@@ -43,12 +48,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Integer> imageClicked = new ArrayList<Integer>();
     private List<Photo> photoList;
     private CustomAdapter adapter;
+    EditText enterUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
+        enterUrl = (EditText)findViewById(R.id.enteredUrl);
         getPhotoData();
         simplegrid = (GridView) findViewById(R.id.GridView);
         adapter = new CustomAdapter(getApplicationContext(), photoList);
@@ -127,15 +135,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if (view == fetchbtn) {
 
-            ImageFetcher im = new ImageFetcher();
+        String url = enterUrl.getText().toString();
+
+        if (view == fetchbtn) {
+            closeKeyboard();
+            if (url.equals("")) {
+                Toast.makeText(this, "You did not enter a url", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            ImageFetcher im = new ImageFetcher(url);
             try {
                 List<String> imageurl = im.extractImage();
+                if(imageurl==null){
+                    Toast.makeText(this, "Invalid url", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 bar.setVisibility(View.VISIBLE);
                 msg.setVisibility(View.VISIBLE);
-
-                new Thread(() -> {
+                Thread thr = new Thread(() -> {
+                    status = 0;
                     while (status < imagetotal) {
                         status++;
                         handler.post(() -> {
@@ -156,18 +175,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             e.printStackTrace();
                         }
                     }
-                }).start();
+                });
+                thr.start();
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
         }
-
-        //assign every button click function to update the state of app for having only 6 images
-        for(int x=0;x<imagetotal;x++){
-            if(view==simplegrid.getChildAt(x).findViewById(R.id.imageView)){
-                setAdapterState(x);
+        else {
+            //assign every button click function to update the state of app for having only 6 images
+            for (int x = 0; x < imagetotal; x++) {
+                if (view == simplegrid.getChildAt(x).findViewById(R.id.imageView)) {
+                    setAdapterState(x);
+                }
             }
+        }
+    }
+
+    private void closeKeyboard(){
+        View view = this.getCurrentFocus();
+        if(view!=null)
+        {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
@@ -176,9 +206,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
         File file = new File(directory, "image" + x + ".jpg");
-        if (!file.exists()) {
-            storeImageInStorage(im, imgurl, file);
-        }
+        storeImageInStorage(im, imgurl, file);
         View viewitem = simplegrid.getChildAt(x - 1);
         imgbtn = (ImageView) viewitem.findViewById(R.id.imageView);
         imgbtn.setOnClickListener(this);

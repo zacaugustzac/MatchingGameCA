@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
@@ -54,7 +55,6 @@ public class GameActivity extends AppCompatActivity {
     Double time= 0.0;
 
     AnimatorSet set;
-    ValueAnimator newtimer;
 
     boolean timerStarted =false;
 
@@ -62,7 +62,10 @@ public class GameActivity extends AppCompatActivity {
 
     Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
     ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
-    ArrayList<Bitmap> chosenImages = new ArrayList<>();
+//    ArrayList<Bitmap> chosenImagesBitmap = new ArrayList<>();
+    ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
+    ArrayList<Drawable> answerDrawable = new ArrayList<>();
+    ArrayList<Integer> chosenPosition = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,16 +75,22 @@ public class GameActivity extends AppCompatActivity {
         //shuffle answer
         answer = shuffle(answer);
 
-        //get intent get chosen images
+        //get intent get chosen images arr from MainActivity
         Intent intent = getIntent();
         chosenImagesArr = intent.getIntegerArrayListExtra("chosenimage");
 
-        //get 6 images in to ArrayList<Bitmap> chosenImages
+        //prepare chosenImageDrawable (get 6 images in to ArrayList<Bitmap> chosenImagesDrawable)
         for (int i=0; i<chosenImagesArr.size(); i++){
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
             File file = new File(directory, "image"+(chosenImagesArr.get(i)+1)+".jpg");
-            chosenImages.add( ( (BitmapDrawable)Drawable.createFromPath( file.toString() ) ).getBitmap());
+//            chosenImages.add( ( (BitmapDrawable)Drawable.createFromPath( file.toString() ) ).getBitmap());
+            chosenImagesDrawable.add(Drawable.createFromPath( file.toString() ));
+        }
+
+        //prepare answerDrawable
+        for (int i=0; i<answer.length ; i++){
+            answerDrawable.add(chosenImagesDrawable.get(answer[i]));
         }
 
         final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
@@ -94,17 +103,68 @@ public class GameActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(currentPos <0){
+                //show image and set animation
+                ((ImageView)view).setImageDrawable(answerDrawable.get(position));
+                set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
+                set.setTarget((ImageView) view);
+                set.start();
 
-                    currentPos = position;
-                    curView = (ImageView)view;
-                    ((ImageView)view).setImageResource
-                            (card[pos[position]]);
+                //record clicked position
+                chosenPosition.add(position);
 
+                //if second item selected is same as first item
+                if (chosenPosition.size() == 2){
+                    if (chosenPosition.get(0) == chosenPosition.get(1)){
+                        Toast.makeText(getApplicationContext(),"Please select different card",Toast.LENGTH_SHORT).show();
+                        chosenPosition.remove(chosenPosition.size()-1);
+                    }
                 }
 
-                else{
+                //if clicked second item
+                if (chosenPosition.size() == 2){
+                    //compare if match
+                    if (answer[chosenPosition.get(0)] == answer[chosenPosition.get(1)]){
+                        correct.start(); // correct sound
+                        Toast.makeText(getApplicationContext(),"Match!",Toast.LENGTH_SHORT).show();
+                        countPair++;
 
+                        //clear selections
+                        chosenPosition.clear();
+                    }
+                    else{ //if no match
+                        Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
+                        wrong.start(); // wrong sound
+//                        new Thread(()->{
+                            SystemClock.sleep(1000); //ms
+
+                            //flip back first item
+                            ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+                            firstItem.setImageDrawable(getDrawable(R.drawable.card));
+
+                            //flip back 2nd item
+                            ((ImageView)view).setImageDrawable(getDrawable(R.drawable.card));
+//                        }).start();
+
+                        //clear selections
+                        chosenPosition.clear();
+                    }
+                }
+
+                //when win
+                if(countPair == 6){
+                    Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
+                    ReturnToMain();
+                }
+
+/*
+                if(currentPos <0){
+                    currentPos = position;
+                    curView = (ImageView)view;
+//                    ((ImageView)view).setImageResource
+//                            (card[pos[position]]);
+//                    ((ImageView)view).setImageDrawable(chosenImagesDrawable.get(position));
+                }
+                else{
                     if(currentPos == position){
                         correct.start();  // if two images match, correct sound
                         ((ImageView)view).setImageResource
@@ -113,6 +173,8 @@ public class GameActivity extends AppCompatActivity {
                         set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
                         set.setTarget((ImageView) view);
                         set.start();
+                        currentPos = -1;
+                        countPair++;
                     }
 
                     else if (pos[currentPos] != pos[position]) {
@@ -125,27 +187,34 @@ public class GameActivity extends AppCompatActivity {
                         set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
                         set.setTarget((ImageView) view);
                         set.start();
+                        currentPos = -1;
                     }
-
-                    else{
-
-                        ((ImageView)view).setImageResource
-                                (card[pos[position]]);
-
-                        countPair++;
-
-                        if(countPair == 6){
-
-                            Toast.makeText(getApplicationContext(),
-                                    "You have Won",Toast.LENGTH_SHORT).show();
-
-                        }
-
+                    if(countPair == 6){
+                        Toast.makeText(getApplicationContext(),
+                                "You have Won",Toast.LENGTH_SHORT).show();
+                        ReturnToMain();
                     }
+                    */
 
-                    currentPos = -1;
 
-                }
+//                    else{
+//
+//                        ((ImageView)view).setImageResource
+//                                (card[pos[position]]);
+//
+//                        countPair++;
+//
+//                        if(countPair == 6){
+//                            gridView.setEnabled(false);
+//                            Toast.makeText(getApplicationContext(),
+//                                    "You have Won",Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                    }
+//
+//                    currentPos = -1;
+
+//                }
             }
         });
 
@@ -160,6 +229,10 @@ public class GameActivity extends AppCompatActivity {
 
 
     }
+    public void ReturnToMain(){
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
+    }
 
     private void activateCountDown(MediaPlayer count) {
         //the countdown feature
@@ -168,6 +241,7 @@ public class GameActivity extends AppCompatActivity {
 
             public void onTick(long millisUntilFinished) {
                 count.start();
+                gridView.setEnabled(false);
                 if((millisUntilFinished)<1000){
                     mTextField.setText("START");
                 }else{
