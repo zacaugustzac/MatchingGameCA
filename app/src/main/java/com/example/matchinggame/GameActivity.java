@@ -152,7 +152,7 @@ public class GameActivity extends AppCompatActivity {
                         //make second item not clickable
                         view.setOnClickListener(null);
 
-                        //update number of matched pairs
+                        //update number of matched pairs textview
                         countPair++;
                         String noOfMatches = countPair+"/6 Matches";
                         numberOfMatchesTextView = findViewById(R.id.numberOfMatchesTextView);
