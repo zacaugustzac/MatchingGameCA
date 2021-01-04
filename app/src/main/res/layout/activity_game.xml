@@ -66,10 +66,11 @@
         android:layout_gravity="center">
 
         <TextView
+            android:id="@+id/numberOfMatchesTextView"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="0/0 Matches"
+            android:text="0/6 Matches"
             android:textColor="@color/black"
             android:layout_gravity="left"
             android:textSize="20dp"/>

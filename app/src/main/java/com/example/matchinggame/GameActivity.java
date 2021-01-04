@@ -40,6 +40,7 @@ import java.util.TimerTask;
 public class GameActivity extends AppCompatActivity {
 
     TextView timerText;
+    TextView numberOfMatchesTextView;
     Button stopStartButton;
     GridView gridView;
     ImageView curView = null;
@@ -151,8 +152,11 @@ public class GameActivity extends AppCompatActivity {
                         //make second item not clickable
                         view.setOnClickListener(null);
 
-
+                        //update number of matched pairs
                         countPair++;
+                        String noOfMatches = countPair+"/6 Matches";
+                        numberOfMatchesTextView = findViewById(R.id.numberOfMatchesTextView);
+                        numberOfMatchesTextView.setText(noOfMatches);
 
                         //clear selections
                         chosenPosition.clear();
