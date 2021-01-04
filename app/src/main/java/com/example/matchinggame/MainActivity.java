@@ -2,18 +2,20 @@ package com.example.matchinggame;
 
 import java.io.File;
 import java.io.FileOutputStream;
+
 import java.net.MalformedURLException;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-import android.app.Activity;
+
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.hardware.input.InputManager;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -21,7 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter.notifyDataSetChanged();
         fetchbtn = findViewById(R.id.fetchbtn);
         fetchbtn.setOnClickListener(this);
+        guide = findViewById(R.id.guide);
         startbtn = findViewById(R.id.start);
         startbtn.setOnClickListener((view->{
             Intent intent= new Intent(this,GameActivity.class);
@@ -150,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(imageurl==null){
                     Toast.makeText(this, "Invalid url", Toast.LENGTH_SHORT).show();
                     return;
+                }else if(imageurl.size()<20){
+                    Toast.makeText(this, "Images not sufficient", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 bar.setVisibility(View.VISIBLE);
                 msg.setVisibility(View.VISIBLE);
@@ -162,10 +168,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             String mess = "Downloading " + (status) + " of " + imagetotal + " images...";
                             msg.setText(mess);
                             loadImage(im, imageurl, status);
+
                             if (status == imagetotal) {
                                 bar.setVisibility(View.GONE);
                                 msg.setVisibility(View.GONE);
-                                guide = findViewById(R.id.guide);
                                 guide.setVisibility(View.VISIBLE);
                             }
                         });
@@ -201,8 +207,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private String manualDecode(String url){
+        if(url.contains("&#x27;")){
+            url=url.replaceAll("&#x27;","'");
+        }
+        return url;
+    }
+
     private void loadImage(ImageFetcher im, List<String> imageurl, int x) {
         String imgurl = imageurl.get(x - 1);
+        imgurl=manualDecode(imgurl);
+        System.out.println("url= "+imgurl);
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
         File file = new File(directory, "image" + x + ".jpg");
