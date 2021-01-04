@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:background="@null"
-            android:onClick="restTapped"
+            android:onClick="resetTapped"
             android:text="RESET"
             android:textColor="@color/red"
             android:textSize="20sp" />

@@ -156,8 +156,12 @@ public class GameActivity extends AppCompatActivity {
 
         timer = new Timer();
 
+        activateCountDown(count);
 
 
+    }
+
+    private void activateCountDown(MediaPlayer count) {
         //the countdown feature
         mTextField=findViewById(R.id.countdown);
         new CountDownTimer(4000, 1000) {
@@ -177,6 +181,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }.start();
     }
+
     //to shuffle the answer
     public Integer[] shuffle(Integer[] intArray){
         List<Integer> intList = Arrays.asList(intArray);
@@ -207,7 +212,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-    public void restTapped(View view){
+    public void resetTapped(View view){
         AlertDialog.Builder resetAlert = new AlertDialog.Builder(this);
         resetAlert.setTitle("Reset Timer");
         resetAlert.setMessage("Are you sure you want to reset the timer?");
@@ -215,9 +220,9 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 if(timerTask != null){
-                    finish();
-                    //TODO:probably the get intent need to be modify?
-                    startActivity(getIntent());
+                    Intent intentfrom1= getIntent();
+                    intentfrom1.putIntegerArrayListExtra("chosenimage",intentfrom1.getIntegerArrayListExtra("chosenimage"));
+                    recreate();
                     //comment the sentence below (unsure if above work perfectly)
 //                    timerTask.cancel();
 //                    setButtonUI("START", R.color.green);
@@ -238,8 +243,6 @@ public class GameActivity extends AppCompatActivity {
         resetAlert.show();
 
     }
-
-
 
     public void startStopTapped(View view) {
         if(timerStarted ==false){

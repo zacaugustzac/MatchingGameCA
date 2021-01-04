@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             adapter.notifyDataSetChanged();
         }else {
-            Toast.makeText(this,"Please chooser six images!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Please choose six images!",Toast.LENGTH_SHORT).show();
         }
     }
 

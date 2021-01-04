@@ -44,7 +44,7 @@ public class ImageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.gridview_item, null);
             imageView = new ImageView(this.context);
-            imageView.setLayoutParams(new GridView.LayoutParams(300,350));
+            imageView.setLayoutParams(new GridView.LayoutParams(300,300));
 
 
         }
