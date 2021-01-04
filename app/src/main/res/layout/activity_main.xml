@@ -11,14 +11,17 @@
         android:id="@+id/linearlayouttop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent">
 
-        <TextView
+        <EditText
+            android:id="@+id/enteredUrl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Later need to be replaced by the user input field!"/>
+            android:hint="@string/fetchhint"
+            android:inputType="text"
+            android:imeOptions="actionDone"/>
 
         <Button
             android:id="@+id/fetchbtn"
