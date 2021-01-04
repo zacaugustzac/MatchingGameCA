@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">MatchingGame</string>
-    <string name="fetch">Fetch the image</string>
+    <string name="fetchhint">Please enter a image URL</string>
+    <string name="fetch">Fetch</string>
     <string name="progressmessage">Downloading 0 of 20 msg...</string>
     <string name="instructions">Pick 6 pictures to be used</string>
     <string name="start">Start Game!</string>

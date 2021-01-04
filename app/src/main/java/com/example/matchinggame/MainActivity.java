@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView msg;
     private TextView guide;
     private Handler handler = new Handler();
-    int status = 0;
+    int status;
     private final int imagetotal = 20;
     private final int imageselected = 6;
     int[] logos = new int[imagetotal];
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Integer> imageClicked = new ArrayList<Integer>();
     private List<Photo> photoList;
     private CustomAdapter adapter;
+    EditText enterUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,15 +129,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if (view == fetchbtn) {
 
-            ImageFetcher im = new ImageFetcher();
+        enterUrl = (EditText)findViewById(R.id.enteredUrl);
+        String url = enterUrl.getText().toString();
+
+        if (view == fetchbtn) {
+            if (url.equals("")) {
+                Toast.makeText(this, "You did not enter a url", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            ImageFetcher im = new ImageFetcher(url);
             try {
                 List<String> imageurl = im.extractImage();
+                if(imageurl==null){
+                    Toast.makeText(this, "Invalid url", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 bar.setVisibility(View.VISIBLE);
                 msg.setVisibility(View.VISIBLE);
-
-                new Thread(() -> {
+                Thread thr = new Thread(() -> {
+                    status = 0;
                     while (status < imagetotal) {
                         status++;
                         handler.post(() -> {
@@ -156,7 +169,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             e.printStackTrace();
                         }
                     }
-                }).start();
+                });
+                thr.start();
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -176,9 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
         File file = new File(directory, "image" + x + ".jpg");
-        if (!file.exists()) {
-            storeImageInStorage(im, imgurl, file);
-        }
+        storeImageInStorage(im, imgurl, file);
         View viewitem = simplegrid.getChildAt(x - 1);
         imgbtn = (ImageView) viewitem.findViewById(R.id.imageView);
         imgbtn.setOnClickListener(this);
