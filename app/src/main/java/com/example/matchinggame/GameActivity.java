@@ -54,7 +54,6 @@ public class GameActivity extends AppCompatActivity {
     Double time= 0.0;
 
     AnimatorSet set;
-    ValueAnimator newtimer;
 
     boolean timerStarted =false;
 
@@ -113,6 +112,8 @@ public class GameActivity extends AppCompatActivity {
                         set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
                         set.setTarget((ImageView) view);
                         set.start();
+                        currentPos = -1;
+                        countPair++;
                     }
 
                     else if (pos[currentPos] != pos[position]) {
@@ -125,25 +126,29 @@ public class GameActivity extends AppCompatActivity {
                         set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
                         set.setTarget((ImageView) view);
                         set.start();
+                        currentPos = -1;
                     }
-
-                    else{
-
-                        ((ImageView)view).setImageResource
-                                (card[pos[position]]);
-
-                        countPair++;
-
-                        if(countPair == 6){
-
-                            Toast.makeText(getApplicationContext(),
-                                    "You have Won",Toast.LENGTH_SHORT).show();
-
-                        }
-
+                    if(countPair == 6){
+                        Toast.makeText(getApplicationContext(),
+                                "You have Won",Toast.LENGTH_SHORT).show();
+                        ReturnToMain();
                     }
-
-                    currentPos = -1;
+//                    else{
+//
+//                        ((ImageView)view).setImageResource
+//                                (card[pos[position]]);
+//
+//                        countPair++;
+//
+//                        if(countPair == 6){
+//                            gridView.setEnabled(false);
+//                            Toast.makeText(getApplicationContext(),
+//                                    "You have Won",Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                    }
+//
+//                    currentPos = -1;
 
                 }
             }
@@ -160,6 +165,10 @@ public class GameActivity extends AppCompatActivity {
 
 
     }
+    public void ReturnToMain(){
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
+    }
 
     private void activateCountDown(MediaPlayer count) {
         //the countdown feature
@@ -168,6 +177,7 @@ public class GameActivity extends AppCompatActivity {
 
             public void onTick(long millisUntilFinished) {
                 count.start();
+                gridView.setEnabled(false);
                 if((millisUntilFinished)<1000){
                     mTextField.setText("START");
                 }else{
