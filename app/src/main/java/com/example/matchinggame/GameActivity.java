@@ -40,6 +40,7 @@ import java.util.TimerTask;
 public class GameActivity extends AppCompatActivity {
 
     TextView timerText;
+    TextView numberOfMatchesTextView;
     Button stopStartButton;
     GridView gridView;
     ImageView curView = null;
@@ -120,33 +121,49 @@ public class GameActivity extends AppCompatActivity {
                     }
                 }
 
+                //if clicked 3rd item
+                if (chosenPosition.size() == 3) {
+                    //flip back first item
+                    ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+                    firstItem.setImageDrawable(getDrawable(R.drawable.card));
+
+                    //flip back 2nd item
+                    ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
+                    secondItem.setImageDrawable(getDrawable(R.drawable.card));
+
+                    chosenPosition.clear();
+                    chosenPosition.add(position);
+
+                    //to cover case where 3rd item is one of the first 2 items
+                    ((ImageView)view).setImageDrawable(answerDrawable.get(position));
+                }
+
                 //if clicked second item
                 if (chosenPosition.size() == 2){
                     //compare if match
                     if (answer[chosenPosition.get(0)] == answer[chosenPosition.get(1)]){
                         correct.start(); // correct sound
                         Toast.makeText(getApplicationContext(),"Match!",Toast.LENGTH_SHORT).show();
+
+                        //make first item not clickable
+                        ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+                        firstItem.setOnClickListener(null);
+
+                        //make second item not clickable
+                        view.setOnClickListener(null);
+
+                        //update number of matched pairs textview
                         countPair++;
+                        String noOfMatches = countPair+"/6 Matches";
+                        numberOfMatchesTextView = findViewById(R.id.numberOfMatchesTextView);
+                        numberOfMatchesTextView.setText(noOfMatches);
 
                         //clear selections
                         chosenPosition.clear();
                     }
-                    else{ //if no match
+                    else{ //if mismatch
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
                         wrong.start(); // wrong sound
-//                        new Thread(()->{
-                            SystemClock.sleep(1000); //ms
-
-                            //flip back first item
-                            ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
-                            firstItem.setImageDrawable(getDrawable(R.drawable.card));
-
-                            //flip back 2nd item
-                            ((ImageView)view).setImageDrawable(getDrawable(R.drawable.card));
-//                        }).start();
-
-                        //clear selections
-                        chosenPosition.clear();
                     }
                 }
 
