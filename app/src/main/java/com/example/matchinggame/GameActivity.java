@@ -64,6 +64,7 @@ public class GameActivity extends AppCompatActivity {
 //    ArrayList<Bitmap> chosenImagesBitmap = new ArrayList<>();
     ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
     ArrayList<Drawable> answerDrawable = new ArrayList<>();
+    ArrayList<Integer> chosenPosition = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,9 +92,6 @@ public class GameActivity extends AppCompatActivity {
             answerDrawable.add(chosenImagesDrawable.get(answer[i]));
         }
 
-
-        //get 6
-
         final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
         final MediaPlayer wrong = MediaPlayer.create(this, R.raw.wrong);
         final MediaPlayer count = MediaPlayer.create(this, R.raw.countdown);
@@ -104,7 +102,49 @@ public class GameActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //show image and set animation
                 ((ImageView)view).setImageDrawable(answerDrawable.get(position));
+                set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
+                set.setTarget((ImageView) view);
+                set.start();
+
+                //record clicked position
+                chosenPosition.add(position);
+
+                //if clicked second item
+                if (chosenPosition.size() == 2){
+                    //compare if match
+                    if (answer[chosenPosition.get(0)] == answer[chosenPosition.get(1)]){
+                        correct.start(); // correct sound
+                        Toast.makeText(getApplicationContext(),"Match!",Toast.LENGTH_SHORT).show();
+                        countPair++;
+
+                        //clear selections
+                        chosenPosition.clear();
+                    }
+                    else{ //if no match
+                        wrong.start(); // wrong sound
+                        Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
+
+                        //flip back first item
+                        ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+                        firstItem.setImageDrawable(getDrawable(R.drawable.card));
+
+                        //flip back 2nd item
+                        ((ImageView)view).setImageDrawable(getDrawable(R.drawable.card));
+
+                        //clear selections
+                        chosenPosition.clear();
+                    }
+                }
+
+                //when win
+                if(countPair == 6){
+                    Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
+                    ReturnToMain();
+                }
+
+/*
                 if(currentPos <0){
                     currentPos = position;
                     curView = (ImageView)view;
@@ -142,6 +182,9 @@ public class GameActivity extends AppCompatActivity {
                                 "You have Won",Toast.LENGTH_SHORT).show();
                         ReturnToMain();
                     }
+                    */
+
+
 //                    else{
 //
 //                        ((ImageView)view).setImageResource
@@ -159,7 +202,7 @@ public class GameActivity extends AppCompatActivity {
 //
 //                    currentPos = -1;
 
-                }
+//                }
             }
         });
 
