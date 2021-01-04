@@ -7,16 +7,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,7 +54,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
+        enterUrl = (EditText)findViewById(R.id.enteredUrl);
         getPhotoData();
         simplegrid = (GridView) findViewById(R.id.GridView);
         adapter = new CustomAdapter(getApplicationContext(), photoList);
@@ -130,10 +136,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
 
-        enterUrl = (EditText)findViewById(R.id.enteredUrl);
         String url = enterUrl.getText().toString();
 
         if (view == fetchbtn) {
+            closeKeyboard();
             if (url.equals("")) {
                 Toast.makeText(this, "You did not enter a url", Toast.LENGTH_SHORT).show();
                 return;
@@ -176,12 +182,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
-
-        //assign every button click function to update the state of app for having only 6 images
-        for(int x=0;x<imagetotal;x++){
-            if(view==simplegrid.getChildAt(x).findViewById(R.id.imageView)){
-                setAdapterState(x);
+        else {
+            //assign every button click function to update the state of app for having only 6 images
+            for (int x = 0; x < imagetotal; x++) {
+                if (view == simplegrid.getChildAt(x).findViewById(R.id.imageView)) {
+                    setAdapterState(x);
+                }
             }
+        }
+    }
+
+    private void closeKeyboard(){
+        View view = this.getCurrentFocus();
+        if(view!=null)
+        {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
