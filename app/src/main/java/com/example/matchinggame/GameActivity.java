@@ -120,33 +120,43 @@ public class GameActivity extends AppCompatActivity {
                     }
                 }
 
+                //if clicked 3rd item
+                if (chosenPosition.size() == 3) {
+                    //flip back first item
+                    ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+                    firstItem.setImageDrawable(getDrawable(R.drawable.card));
+
+                    //flip back 2nd item
+                    ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
+                    secondItem.setImageDrawable(getDrawable(R.drawable.card));
+
+                    chosenPosition.clear();
+                    chosenPosition.add(position);
+                }
+
                 //if clicked second item
                 if (chosenPosition.size() == 2){
                     //compare if match
                     if (answer[chosenPosition.get(0)] == answer[chosenPosition.get(1)]){
                         correct.start(); // correct sound
                         Toast.makeText(getApplicationContext(),"Match!",Toast.LENGTH_SHORT).show();
+
+                        //make first item not clickable
+                        ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+                        firstItem.setOnClickListener(null);
+
+                        //make second item not clickable
+                        view.setOnClickListener(null);
+
+
                         countPair++;
 
                         //clear selections
                         chosenPosition.clear();
                     }
-                    else{ //if no match
+                    else{ //if mismatch
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
                         wrong.start(); // wrong sound
-//                        new Thread(()->{
-                            SystemClock.sleep(1000); //ms
-
-                            //flip back first item
-                            ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
-                            firstItem.setImageDrawable(getDrawable(R.drawable.card));
-
-                            //flip back 2nd item
-                            ((ImageView)view).setImageDrawable(getDrawable(R.drawable.card));
-//                        }).start();
-
-                        //clear selections
-                        chosenPosition.clear();
                     }
                 }
 
