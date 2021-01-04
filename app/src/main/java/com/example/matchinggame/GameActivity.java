@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
@@ -111,6 +112,14 @@ public class GameActivity extends AppCompatActivity {
                 //record clicked position
                 chosenPosition.add(position);
 
+                //if second item selected is same as first item
+                if (chosenPosition.size() == 2){
+                    if (chosenPosition.get(0) == chosenPosition.get(1)){
+                        Toast.makeText(getApplicationContext(),"Please select different card",Toast.LENGTH_SHORT).show();
+                        chosenPosition.remove(chosenPosition.size()-1);
+                    }
+                }
+
                 //if clicked second item
                 if (chosenPosition.size() == 2){
                     //compare if match
@@ -123,15 +132,18 @@ public class GameActivity extends AppCompatActivity {
                         chosenPosition.clear();
                     }
                     else{ //if no match
-                        wrong.start(); // wrong sound
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
+                        wrong.start(); // wrong sound
+//                        new Thread(()->{
+                            SystemClock.sleep(1000); //ms
 
-                        //flip back first item
-                        ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
-                        firstItem.setImageDrawable(getDrawable(R.drawable.card));
+                            //flip back first item
+                            ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+                            firstItem.setImageDrawable(getDrawable(R.drawable.card));
 
-                        //flip back 2nd item
-                        ((ImageView)view).setImageDrawable(getDrawable(R.drawable.card));
+                            //flip back 2nd item
+                            ((ImageView)view).setImageDrawable(getDrawable(R.drawable.card));
+//                        }).start();
 
                         //clear selections
                         chosenPosition.clear();
