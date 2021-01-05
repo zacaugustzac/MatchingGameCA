@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ProgressBar bar;
     private TextView msg;
     private TextView guide;
-    private Handler handler = new Handler();
     int status;
     private final int imagetotal = 20;
     private final int imageselected = 6;
@@ -50,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Integer> imageClicked = new ArrayList<Integer>();
     private List<Photo> photoList;
     private CustomAdapter adapter;
+    Thread thr;
     EditText enterUrl;
 
     @Override
@@ -133,60 +133,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this,"Please choose six images!",Toast.LENGTH_SHORT).show();
         }
     }
-
-
-
+    
     @Override
     public void onClick(View view) {
 
         String url = enterUrl.getText().toString();
 
         if (view == fetchbtn) {
-            closeKeyboard();
-            if (url.equals("")) {
-                Toast.makeText(this, "You did not enter a url", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            ImageFetcher im = new ImageFetcher(url);
-            try {
-                List<String> imageurl = im.extractImage();
-                if(imageurl==null){
-                    Toast.makeText(this, "Invalid url", Toast.LENGTH_SHORT).show();
-                    return;
-                }else if(imageurl.size()<20){
-                    Toast.makeText(this, "Images not sufficient", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                bar.setVisibility(View.VISIBLE);
-                msg.setVisibility(View.VISIBLE);
-                Thread thr = new Thread(() -> {
-                    status = 0;
-                    while (status < imagetotal) {
-                        status++;
-                        handler.post(() -> {
-                            bar.setProgress(status * 10);
-                            String mess = "Downloading " + (status) + " of " + imagetotal + " images...";
-                            msg.setText(mess);
-                            loadImage(im, imageurl, status);
-
-                            if (status == imagetotal) {
-                                bar.setVisibility(View.GONE);
-                                msg.setVisibility(View.GONE);
-                                guide.setVisibility(View.VISIBLE);
-                            }
-                        });
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                thr.start();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            fetchImages(url);
         }
         else {
             //assign every button click function to update the state of app for having only 6 images
@@ -195,6 +149,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     setAdapterState(x);
                 }
             }
+        }
+    }
+
+    private void fetchImages(String url) {
+        if(thr!=null){
+            System.out.println("interupt here");
+            thr.interrupt();
+        }
+
+        closeKeyboard();
+        if (url.equals("")) {
+            Toast.makeText(this, "You did not enter a url", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ImageFetcher im = new ImageFetcher(url);
+        try {
+            List<String> imageurl = im.extractImage();
+            if(imageurl==null){
+                Toast.makeText(this, "Invalid url", Toast.LENGTH_SHORT).show();
+                return;
+            }else if(imageurl.size()<20){
+                Toast.makeText(this, "Images not sufficient", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            imageurl.stream().limit(10).forEach(System.out::println);
+
+            bar.setVisibility(View.VISIBLE);
+            msg.setVisibility(View.VISIBLE);
+            status = 0;
+            bar.setProgress(status * 10);
+
+            thr= new Thread (()->{
+                    while (status < imagetotal) {
+                        status++;
+                        runOnUiThread(()-> {
+                                loadImage(im, imageurl, status);
+                                if (status == imagetotal) {
+                                    bar.setVisibility(View.GONE);
+                                    msg.setVisibility(View.GONE);
+                                    guide.setVisibility(View.VISIBLE);
+                                }
+                        });
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            status=imagetotal;
+                            //e.printStackTrace();
+                        }
+                    }
+            });
+            thr.start();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -217,7 +225,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void loadImage(ImageFetcher im, List<String> imageurl, int x) {
         String imgurl = imageurl.get(x - 1);
         imgurl=manualDecode(imgurl);
-        System.out.println("url= "+imgurl);
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
         File file = new File(directory, "image" + x + ".jpg");

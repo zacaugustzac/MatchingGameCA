@@ -172,66 +172,6 @@ public class GameActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
                     ReturnToMain();
                 }
-
-/*
-                if(currentPos <0){
-                    currentPos = position;
-                    curView = (ImageView)view;
-//                    ((ImageView)view).setImageResource
-//                            (card[pos[position]]);
-//                    ((ImageView)view).setImageDrawable(chosenImagesDrawable.get(position));
-                }
-                else{
-                    if(currentPos == position){
-                        correct.start();  // if two images match, correct sound
-                        ((ImageView)view).setImageResource
-                                (R.drawable.card);
-                        //Animation
-                        set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
-                        set.setTarget((ImageView) view);
-                        set.start();
-                        currentPos = -1;
-                        countPair++;
-                    }
-
-                    else if (pos[currentPos] != pos[position]) {
-                        wrong.start(); // if two images mismatch, wrong sound
-                        curView.setImageResource(R.drawable.card);
-                        Toast.makeText(getApplicationContext(),
-                                //TODO with
-                                "No Match",Toast.LENGTH_SHORT).show();
-                        //Animation
-                        set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
-                        set.setTarget((ImageView) view);
-                        set.start();
-                        currentPos = -1;
-                    }
-                    if(countPair == 6){
-                        Toast.makeText(getApplicationContext(),
-                                "You have Won",Toast.LENGTH_SHORT).show();
-                        ReturnToMain();
-                    }
-                    */
-
-
-//                    else{
-//
-//                        ((ImageView)view).setImageResource
-//                                (card[pos[position]]);
-//
-//                        countPair++;
-//
-//                        if(countPair == 6){
-//                            gridView.setEnabled(false);
-//                            Toast.makeText(getApplicationContext(),
-//                                    "You have Won",Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                    }
-//
-//                    currentPos = -1;
-
-//                }
             }
         });
 
