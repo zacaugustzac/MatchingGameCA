@@ -42,7 +42,7 @@
         android:layout_width="286dp"
         android:layout_height="46dp"
         android:layout_marginStart="8dp"
-        android:hint="Please enter the url"
+        android:text="https://stocksnap.io/search/"
         android:textColorHint="@color/hint"
         app:layout_constraintBottom_toBottomOf="@+id/url"
         app:layout_constraintStart_toStartOf="@+id/url"

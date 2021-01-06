@@ -51,6 +51,7 @@ public class GameActivity extends AppCompatActivity {
     int[] pos = {0,1,2,3,4,5,6,0,1,2,3,4,5,6};
     int currentPos = -1;
 
+    Timer timerback = new Timer();
     Timer timer;
     TimerTask timerTask;
     Double time= 0.0;
@@ -101,6 +102,13 @@ public class GameActivity extends AppCompatActivity {
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
 
+        timerText =(TextView) findViewById(R.id.timerText);
+        stopStartButton=(Button)findViewById(R.id.startStopButton);
+
+        timer = new Timer();
+
+        activateCountDown(count);
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -143,7 +151,6 @@ public class GameActivity extends AppCompatActivity {
                     //compare if match
                     if (answer[chosenPosition.get(0)] == answer[chosenPosition.get(1)]){
                         correct.start(); // correct sound
-                        Toast.makeText(getApplicationContext(),"Match!",Toast.LENGTH_SHORT).show();
 
                         //make first item not clickable
                         ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
@@ -170,79 +177,19 @@ public class GameActivity extends AppCompatActivity {
                 //when win
                 if(countPair == 6){
                     Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
-                    ReturnToMain();
+                    if(timerStarted == true){
+                        timerTask.cancel();
+                    }
+                    TimerTask task = new TimerTask() {
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    };
+                    timerback.schedule(task, 1000 * 5);
                 }
-
-/*
-                if(currentPos <0){
-                    currentPos = position;
-                    curView = (ImageView)view;
-//                    ((ImageView)view).setImageResource
-//                            (card[pos[position]]);
-//                    ((ImageView)view).setImageDrawable(chosenImagesDrawable.get(position));
-                }
-                else{
-                    if(currentPos == position){
-                        correct.start();  // if two images match, correct sound
-                        ((ImageView)view).setImageResource
-                                (R.drawable.card);
-                        //Animation
-                        set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
-                        set.setTarget((ImageView) view);
-                        set.start();
-                        currentPos = -1;
-                        countPair++;
-                    }
-
-                    else if (pos[currentPos] != pos[position]) {
-                        wrong.start(); // if two images mismatch, wrong sound
-                        curView.setImageResource(R.drawable.card);
-                        Toast.makeText(getApplicationContext(),
-                                //TODO with
-                                "No Match",Toast.LENGTH_SHORT).show();
-                        //Animation
-                        set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
-                        set.setTarget((ImageView) view);
-                        set.start();
-                        currentPos = -1;
-                    }
-                    if(countPair == 6){
-                        Toast.makeText(getApplicationContext(),
-                                "You have Won",Toast.LENGTH_SHORT).show();
-                        ReturnToMain();
-                    }
-                    */
-
-
-//                    else{
-//
-//                        ((ImageView)view).setImageResource
-//                                (card[pos[position]]);
-//
-//                        countPair++;
-//
-//                        if(countPair == 6){
-//                            gridView.setEnabled(false);
-//                            Toast.makeText(getApplicationContext(),
-//                                    "You have Won",Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                    }
-//
-//                    currentPos = -1;
-
-//                }
             }
         });
-
-
-
-        timerText =(TextView) findViewById(R.id.timerText);
-        stopStartButton=(Button)findViewById(R.id.startStopButton);
-
-        timer = new Timer();
-
-        activateCountDown(count);
 
 
     }
