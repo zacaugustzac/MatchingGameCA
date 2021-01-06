@@ -193,10 +193,6 @@ public class GameActivity extends AppCompatActivity {
 
 
     }
-    public void ReturnToMain(){
-        Intent intent = new Intent(this,MainActivity.class);
-        startActivity(intent);
-    }
 
     private void activateCountDown(MediaPlayer count) {
         //the countdown feature
@@ -227,23 +223,6 @@ public class GameActivity extends AppCompatActivity {
         return intList.toArray(intArray);
     }
 
-    //to change default card to image behind the answer, work in progress
-    public void flip(View v){
-        ImageView imageView = (ImageView)v; //convert to imageview
-        Bitmap current = ((BitmapDrawable)imageView.getDrawable()).getBitmap(); //get current picture bitmap
-        Drawable defDrawable = getResources().getDrawable(R.drawable.default_image,null); //get default picture bitmap
-        Bitmap def = ((BitmapDrawable)defDrawable).getBitmap();
-        //compare - if default change to picture, else change to default
-        if(current == def) {
-            ContextWrapper cw = new ContextWrapper(getApplicationContext());
-            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-            File file = new File(directory, "image9.jpg");
-            imageView.setImageDrawable(Drawable.createFromPath((file.toString())));
-        } else {
-            imageView.setImageDrawable(getResources().getDrawable(R.drawable.default_image,null));
-        }
-    }
-
     public void back(View view){
         Intent intent = new Intent(this,MainActivity.class);
         startActivity(intent);
@@ -261,12 +240,6 @@ public class GameActivity extends AppCompatActivity {
                     Intent intentfrom1= getIntent();
                     intentfrom1.putIntegerArrayListExtra("chosenimage",intentfrom1.getIntegerArrayListExtra("chosenimage"));
                     recreate();
-                    //comment the sentence below (unsure if above work perfectly)
-//                    timerTask.cancel();
-//                    setButtonUI("START", R.color.green);
-//                    time = 0.0;
-//                    timerStarted = false;
-//                    timerText.setText(formatTime(0,0,0));
                 }
 
             }
@@ -286,7 +259,6 @@ public class GameActivity extends AppCompatActivity {
         if(timerStarted ==false){
             timerStarted =true;
             setButtonUI("PAUSE", R.color.red);
-            //GridView.setEnabled(true);
             gridView.setEnabled(true);
             startTimer();
 
@@ -294,7 +266,6 @@ public class GameActivity extends AppCompatActivity {
         else{
             timerStarted =false;
             setButtonUI("RESTART", R.color.green);
-            //GridView.setEnabled(false);
             gridView.setEnabled(false);
             timerTask.cancel();
         }

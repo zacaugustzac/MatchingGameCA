@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             boolean photoChecked = photoList.get(index).isPhotoChecked();
             if (photoChecked==true){
                 imageClicked.add(index);
-                if(imageClicked.size()==imageselected){
+                if(imageClicked.size()==imageselected&&bar.getVisibility()!=View.VISIBLE){
                     startbtn.setVisibility(View.VISIBLE);
                     guide.setVisibility(View.GONE);
                 }
@@ -122,9 +122,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 for (int i = 0; i < imageClicked.size(); i++) {
                     if (imageClicked.get(i)==index){
                         imageClicked.remove(i);
-                        startbtn.setVisibility(View.GONE);
-                        guide.setVisibility(View.VISIBLE);
-
+                        if(bar.getVisibility()!=View.VISIBLE){
+                            startbtn.setVisibility(View.GONE);
+                            guide.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
             }
@@ -163,47 +164,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "You did not enter a url", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        guide.setVisibility(View.GONE);
+        startbtn.setVisibility(View.GONE);
         ImageFetcher im = new ImageFetcher(url);
-        try {
-            List<String> imageurl = im.extractImage();
-            if(imageurl==null){
-                Toast.makeText(this, "Invalid url", Toast.LENGTH_SHORT).show();
-                return;
-            }else if(imageurl.size()<20){
-                Toast.makeText(this, "Images not sufficient", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            imageurl.stream().limit(10).forEach(System.out::println);
+        List<String> imageurl = im.extractImage();
+        if(imageurl==null){
+            Toast.makeText(this, "Invalid url", Toast.LENGTH_SHORT).show();
+            return;
+        }else if(imageurl.size()<20){
+            Toast.makeText(this, "Images not sufficient", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            bar.setVisibility(View.VISIBLE);
-            msg.setVisibility(View.VISIBLE);
-            status = 0;
-            bar.setProgress(status * 10);
+        bar.setVisibility(View.VISIBLE);
+        msg.setVisibility(View.VISIBLE);
+        status = 0;
+        bar.setProgress(status * 10);
 
-            thr= new Thread (()->{
-                while (status < imagetotal) {
-                    status++;
-                    runOnUiThread(()-> {
-                        loadImage(im, imageurl, status);
-                        if (status == imagetotal) {
-                            bar.setVisibility(View.GONE);
-                            msg.setVisibility(View.GONE);
+        thr= new Thread (()->{
+            while (status < imagetotal) {
+                status++;
+                runOnUiThread(()-> {
+                    loadImage(im, imageurl, status);
+                    if (status == imagetotal) {
+                        bar.setVisibility(View.GONE);
+                        msg.setVisibility(View.GONE);
+                        if(imageClicked.size()==imageselected){
+                            startbtn.setVisibility(View.VISIBLE);
+                        }else{
                             guide.setVisibility(View.VISIBLE);
                         }
-                    });
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        status=imagetotal;
-                        //e.printStackTrace();
                     }
+                });
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    status=imagetotal;
+                    //e.printStackTrace();
                 }
-            });
-            thr.start();
+            }
+        });
+        thr.start();
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
     }
 
     private void closeKeyboard(){

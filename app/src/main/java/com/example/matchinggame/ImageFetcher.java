@@ -22,12 +22,7 @@ public class ImageFetcher {
         this.linkurl=url;
     }
 
-    //public ImageFetcher(){
-        //linkurl="https://stocksnap.io/search/celebration+party+fireworks";
-        //linkurl="https://stocksnap.io/search/cars";
-    //}
-
-    public List<String> extractImage() throws MalformedURLException {
+    public List<String> extractImage(){
         URL url;
         List<String> dirty=null;
 
@@ -49,7 +44,6 @@ public class ImageFetcher {
                     .map(y->clearing(y))
                     .limit(20)
                     .collect(Collectors.toList());
-            System.out.println("size="+ dirty.size());
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
