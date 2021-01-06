@@ -22,6 +22,7 @@ public class ImageFetcher {
         this.linkurl=url;
     }
 
+
     public List<String> extractImage(){
         URL url;
         List<String> dirty=null;
@@ -40,7 +41,7 @@ public class ImageFetcher {
             }
             br.close();
             dirty=htmlcontent.stream()
-                    .filter(x->x.contains("<img src="))
+                    .filter(x->x.contains("<img src=\"http"))
                     .map(y->clearing(y))
                     .limit(20)
                     .collect(Collectors.toList());
@@ -58,6 +59,7 @@ public class ImageFetcher {
     }
 
     public Bitmap convertImage(String url) throws IOException {
+        System.out.println(url);
         URL urlimg = new URL(url);
         URLConnection conn = urlimg.openConnection();
         conn.addRequestProperty("User-Agent", useragentValue);

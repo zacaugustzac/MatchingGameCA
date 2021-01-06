@@ -2,6 +2,8 @@ package com.example.matchinggame;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -13,5 +15,13 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
+    }
+
+    @Test
+    public void FetcherTest(){
+        ImageFetcher im= new ImageFetcher("https://stocksnap.io");
+        List<String> group= im.extractImage();
+        group.stream().forEach(x->System.out.println(x));
+
     }
 }
