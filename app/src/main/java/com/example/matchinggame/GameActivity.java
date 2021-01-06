@@ -42,6 +42,7 @@ public class GameActivity extends AppCompatActivity {
     TextView timerText;
     TextView numberOfMatchesTextView;
     Button stopStartButton;
+    Button resetButton;
     GridView gridView;
     ImageView curView = null;
     private int countPair = 0;
@@ -104,7 +105,7 @@ public class GameActivity extends AppCompatActivity {
 
         timerText =(TextView) findViewById(R.id.timerText);
         stopStartButton=(Button)findViewById(R.id.startStopButton);
-
+        resetButton=(Button)findViewById(R.id.restTapped);
         timer = new Timer();
 
         activateCountDown(count);
@@ -178,9 +179,11 @@ public class GameActivity extends AppCompatActivity {
                 if(countPair == 6){
                     Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
                     if(timerStarted == true){
+                        stopStartButton.setEnabled(false);
+                        resetButton.setEnabled(false);
                         timerTask.cancel();
                     }
-                    TimerTask task = new TimerTask() {
+                    TimerTask task = new TimerTask() {;
                         @Override
                         public void run() {
                             finish();
@@ -200,8 +203,9 @@ public class GameActivity extends AppCompatActivity {
         new CountDownTimer(4000, 1000) {
 
             public void onTick(long millisUntilFinished) {
+                stopStartButton.setVisibility(View.INVISIBLE);
                 count.start();
-                gridView.setEnabled(false);
+               gridView.setEnabled(false);
                 if((millisUntilFinished)<1000){
                     mTextField.setText("START");
                 }else{
@@ -278,7 +282,7 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void startTimer()
-    {   //GridView.setVisibility(View.VISIBLE);
+    {   stopStartButton.setVisibility(View.VISIBLE);
         timerTask = new TimerTask() {
             @Override
             public void run() {
