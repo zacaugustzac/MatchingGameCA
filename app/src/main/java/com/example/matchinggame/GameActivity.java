@@ -4,6 +4,8 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
@@ -14,6 +16,8 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -32,6 +36,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -44,14 +49,7 @@ public class GameActivity extends AppCompatActivity {
     Button stopStartButton;
     Button resetButton;
     GridView gridView;
-    ImageView curView = null;
     private int countPair = 0;
-    int card[] ={R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card,
-            R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card,
-            R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card} ;
-    int[] pos = {0,1,2,3,4,5,6,0,1,2,3,4,5,6};
-    int currentPos = -1;
-
     Timer timerback = new Timer();
     Timer timer;
     TimerTask timerTask;
@@ -65,10 +63,10 @@ public class GameActivity extends AppCompatActivity {
 
     Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
     ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
-//    ArrayList<Bitmap> chosenImagesBitmap = new ArrayList<>();
     ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
     ArrayList<Drawable> answerDrawable = new ArrayList<>();
     ArrayList<Integer> chosenPosition = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +85,6 @@ public class GameActivity extends AppCompatActivity {
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
             File file = new File(directory, "image"+(chosenImagesArr.get(i)+1)+".jpg");
-//            chosenImages.add( ( (BitmapDrawable)Drawable.createFromPath( file.toString() ) ).getBitmap());
             chosenImagesDrawable.add(Drawable.createFromPath( file.toString() ));
         }
 
@@ -132,14 +129,8 @@ public class GameActivity extends AppCompatActivity {
 
                 //if clicked 3rd item
                 if (chosenPosition.size() == 3) {
-                    //flip back first item
-                    ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
-                    firstItem.setImageDrawable(getDrawable(R.drawable.card));
 
-                    //flip back 2nd item
-                    ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
-                    secondItem.setImageDrawable(getDrawable(R.drawable.card));
-
+                    //reset array
                     chosenPosition.clear();
                     chosenPosition.add(position);
 
@@ -160,7 +151,7 @@ public class GameActivity extends AppCompatActivity {
                         //make second item not clickable
                         view.setOnClickListener(null);
 
-                        //update number of matched pairs textview
+                        //update number of matched pairs textView
                         countPair++;
                         String noOfMatches = countPair+"/6 Matches";
                         numberOfMatchesTextView = findViewById(R.id.numberOfMatchesTextView);
@@ -172,6 +163,11 @@ public class GameActivity extends AppCompatActivity {
                     else{ //if mismatch
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
                         wrong.start(); // wrong sound
+//                        autoClose(this, parent, 3);
+                        int pos1 = chosenPosition.get(0);
+                        int pos2 = chosenPosition.get(1);
+//                        closeTwoAlarm.Start(GameActivity.this,3, pos1, pos2);
+                        closeTwo(GameActivity.this, 0);
                     }
                 }
 
@@ -314,4 +310,69 @@ public class GameActivity extends AppCompatActivity {
     {
         return String.format("%02d",hours)+" : "+ String.format("%02d",minutes)+" : "+ String.format("%02d",seconds);
     }
+
+    //auto close if no 3rd item is chosen after a few seconds, runs when mismatch
+//    private void autoClose(AdapterView<?> parent) {
+//        Handler mainHandler = new Handler(Looper.getMainLooper());
+//        mainHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                //if it is still only 2 cards open
+//                if (chosenPosition.size() == 2) {
+//                    //flip back first item
+//                    ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+//                    firstItem.setImageDrawable(getDrawable(R.drawable.card));
+//
+//                    //flip back 2nd item
+//                    ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
+//                    secondItem.setImageDrawable(getDrawable(R.drawable.card));
+//
+//                    chosenPosition.clear();
+//                }
+//            }
+//        }, 3000);
+//    }
+
+//    auto close with alarm manager
+//    public void autoClose(Context context, AdapterView<?> parent, int seconds) {
+//        Date when = new Date(System.currentTimeMillis());
+//
+//        Intent intent = new Intent(context, MyReceiver.class);
+//        intent.setAction("DISPLAY_QUOTE");
+//
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+//                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        AlarmManager alarm =
+//                (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//        alarm.setExact(AlarmManager.RTC_WAKEUP,
+//                when.getTime() + seconds * 1000,
+//                pendingIntent) ;
+//    }
+
+    public void closeTwoCards(AdapterView<?> parent){
+        //flip back first item
+        ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+        firstItem.setImageDrawable(getDrawable(R.drawable.card));
+
+        //flip back 2nd item
+        ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
+        secondItem.setImageDrawable(getDrawable(R.drawable.card));
+    }
+
+    public void closeTwo(Context context, int seconds){
+        Date when = new Date(System.currentTimeMillis());
+
+        Intent intent = new Intent(context, MyReceiver.class);
+        intent.setAction("CLOSE_TWO");
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarm.setExact(AlarmManager.RTC_WAKEUP,when.getTime() + seconds * 1000, pendingIntent) ;
+
+//        ((GridView) findViewById(R.id.GridView)).getChildAt(0);
+
+    }
 }
+
