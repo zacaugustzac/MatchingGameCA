@@ -15,10 +15,12 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,6 +29,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -177,24 +189,22 @@ public class GameActivity extends AppCompatActivity {
 
                 //when win
                 if(countPair == 6){
-                    Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
-                    if(timerStarted == true){
-                        stopStartButton.setEnabled(false);
-                        resetButton.setEnabled(false);
-                        timerTask.cancel();
-                    }
-                    TimerTask task = new TimerTask() {;
-                        @Override
-                        public void run() {
-                            finish();
-                        }
-                    };
-                    timerback.schedule(task, 1000 * 5);
+                    winningCondition();
                 }
             }
         });
 
 
+    }
+
+    private void winningCondition() {
+        Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
+        if(timerStarted == true){
+            stopStartButton.setEnabled(false);
+            resetButton.setEnabled(false);
+            timerTask.cancel();
+        }
+        promptUser();
     }
 
     private void activateCountDown(MediaPlayer count) {
@@ -231,7 +241,6 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = new Intent(this,MainActivity.class);
         startActivity(intent);
     }
-
 
     public void resetTapped(View view){
         AlertDialog.Builder resetAlert = new AlertDialog.Builder(this);
@@ -280,6 +289,38 @@ public class GameActivity extends AppCompatActivity {
         stopStartButton.setTextColor(ContextCompat.getColor(this, color));
     }
 
+    public void promptUser(){
+        LayoutInflater li = LayoutInflater.from(this);
+        View promptView=li.inflate(R.layout.prompt,null);
+        AlertDialog.Builder dlg=new AlertDialog.Builder(this);
+        dlg.setView(promptView);
+        EditText input= promptView.findViewById(R.id.nameinput);
+        dlg.setCancelable(false)
+                .setPositiveButton("submit", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dlg,int which){
+                        String name=input.getText().toString();
+                        String time=timerText.getText().toString();
+                        sendTheScore(name,time);
+                        finish();
+
+            }
+        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+
+            }
+        });
+        dlg.create().show();
+
+//        TimerTask task = new TimerTask() {;
+//            @Override
+//            public void run() {
+//                finish();
+//            }
+//        };
+//        timerback.schedule(task, 1000 * 20);
+    }
 
     private void startTimer()
     {   stopStartButton.setVisibility(View.VISIBLE);
@@ -313,5 +354,42 @@ public class GameActivity extends AppCompatActivity {
     private String formatTime(int seconds, int minutes, int hours)
     {
         return String.format("%02d",hours)+" : "+ String.format("%02d",minutes)+" : "+ String.format("%02d",seconds);
+    }
+
+    public void sendTheScore(String name,String time){
+// Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(this);
+        int min=Integer.valueOf(time.split(":")[1].trim());
+        int sec=Integer.valueOf(time.split(":")[2].trim());
+        String url="http://10.0.2.2:8080/api/leaderboard/player?name="+name+"&min="+min+"&sec="+sec;
+        System.out.println(url);
+
+// Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+
+                        System.out.println("Response is: "+ response.toString());
+                        try {
+                            JSONObject result= new JSONObject(response.toString());
+                            Toast.makeText(GameActivity.this,"saved successfully",Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                System.out.println(error.getMessage());
+                Toast.makeText(GameActivity.this,"Saving is failed!",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+// Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 }
