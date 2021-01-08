@@ -152,6 +152,7 @@ public class GameActivity extends AppCompatActivity {
                     //compare if match
                     if (answer[chosenPosition.get(0)] == answer[chosenPosition.get(1)]){
                         correct.start(); // correct sound
+                        correct.stop();
 
                         //make first item not clickable
                         ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
@@ -172,6 +173,7 @@ public class GameActivity extends AppCompatActivity {
                     else{ //if mismatch
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
                         wrong.start(); // wrong sound
+                        wrong.stop();
                     }
                 }
 
@@ -208,6 +210,7 @@ public class GameActivity extends AppCompatActivity {
                gridView.setEnabled(false);
                 if((millisUntilFinished)<1000){
                     mTextField.setText("START");
+                    count.stop();
                 }else{
                     mTextField.setText(""+(millisUntilFinished) / 1000);
                 }
