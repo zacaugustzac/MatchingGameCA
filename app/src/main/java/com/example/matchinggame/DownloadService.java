@@ -49,8 +49,6 @@ public class DownloadService extends Service {
              }).start();
 
          }
-
-
         return START_NOT_STICKY;
     }
 

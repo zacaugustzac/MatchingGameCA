@@ -1,11 +1,8 @@
 package com.example.matchinggame;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -57,18 +54,4 @@ public class ImageFetcher {
     public String clearing(String input){
         return input.split("\"")[1];
     }
-
-    public Bitmap convertImage(String url) throws IOException {
-        System.out.println(url);
-        URL urlimg = new URL(url);
-        URLConnection conn = urlimg.openConnection();
-        conn.addRequestProperty("User-Agent", useragentValue);
-        conn.connect();
-        InputStream in = conn.getInputStream();
-        Bitmap bitmap = BitmapFactory.decodeStream(in);
-        in.close();
-        return bitmap;
-
-    }
-
 }

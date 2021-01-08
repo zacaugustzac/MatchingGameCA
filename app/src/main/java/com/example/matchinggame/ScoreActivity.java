@@ -18,11 +18,9 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ScoreActivity extends AppCompatActivity {
     private Button mback;
-    private JSONObject ans;
 
     private ListView listing;
 

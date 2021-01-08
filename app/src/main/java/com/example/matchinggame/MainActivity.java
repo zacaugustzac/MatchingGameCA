@@ -1,26 +1,16 @@
 package com.example.matchinggame;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
-import java.net.MalformedURLException;
-
 import java.util.ArrayList;
 import java.util.List;
 
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -52,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Integer> imageClicked = new ArrayList<Integer>();
     private List<Photo> photoList;
     private CustomAdapter adapter;
-    Thread thr;
     EditText enterUrl;
 
     @Override
@@ -176,10 +165,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void fetchImages(String url) {
-        if (thr != null) {
-            System.out.println("interupt here");
-            thr.interrupt();
-        }
 
         closeKeyboard();
         if (url.equals("")) {
