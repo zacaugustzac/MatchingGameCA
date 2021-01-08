@@ -2,13 +2,9 @@ package com.example.matchinggame;
 
 import java.io.File;
 import java.io.FileOutputStream;
-
 import java.net.MalformedURLException;
-
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -16,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;

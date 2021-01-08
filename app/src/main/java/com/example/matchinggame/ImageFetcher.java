@@ -22,6 +22,10 @@ public class ImageFetcher {
         this.linkurl=url;
     }
 
+    public ImageFetcher() {
+
+    }
+
 
     public List<String> extractImage(){
         URL url;
