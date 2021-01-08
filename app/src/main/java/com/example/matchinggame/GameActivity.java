@@ -44,39 +44,27 @@ public class GameActivity extends AppCompatActivity {
     Button stopStartButton;
     Button resetButton;
     GridView gridView;
-    ImageView curView = null;
     private int countPair = 0;
-    int card[] ={R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card,
-            R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card,
-            R.drawable.card,R.drawable.card,R.drawable.card,R.drawable.card} ;
-    int[] pos = {0,1,2,3,4,5,6,0,1,2,3,4,5,6};
-    int currentPos = -1;
-
     Timer timerback = new Timer();
     Timer timer;
     TimerTask timerTask;
     Double time= 0.0;
-
     AnimatorSet set;
-
     boolean timerStarted =false;
-
     TextView mTextField;
-
     Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
     ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
-//    ArrayList<Bitmap> chosenImagesBitmap = new ArrayList<>();
     ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
     ArrayList<Drawable> answerDrawable = new ArrayList<>();
     ArrayList<Integer> chosenPosition = new ArrayList<>();
+    boolean newMismatch = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        //shuffle answer
-        answer = shuffle(answer);
+        answer = shuffle(answer);        //shuffle answer
 
         //get intent get chosen images arr from MainActivity
         Intent intent = getIntent();
