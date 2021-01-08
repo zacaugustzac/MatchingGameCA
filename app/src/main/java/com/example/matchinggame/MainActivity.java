@@ -36,7 +36,8 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private Button fetchbtn;
     private ImageView imgbtn;
-    private Button startbtn, mscore;
+    private Button startbtn;
+    private Button mscore;
     private ProgressBar bar;
     private TextView msg;
     private TextView guide;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fetchbtn = findViewById(R.id.fetchbtn);
         fetchbtn.setOnClickListener(this);
         mscore = findViewById(R.id.score);
+        mscore.setOnClickListener(this);
         guide = findViewById(R.id.guide);
         startbtn = findViewById(R.id.start);
         startbtn.setOnClickListener((view -> {
@@ -74,14 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
 
         }));
-        mscore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
-                startActivity(intent);
-            }
-
-        });
         bar = findViewById(R.id.progress);
         msg = findViewById(R.id.progressmsg);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -150,6 +144,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (view == fetchbtn) {
             fetchImages(url);
+        } else if(view==mscore){
+            Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
+            startActivity(intent);
         } else {
             //assign every button click function to update the state of app for having only 6 images
             for (int x = 0; x < imagetotal; x++) {
