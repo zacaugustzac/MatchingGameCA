@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView msg;
     private TextView guide;
     int status;
+    private String actiondownload="DOWNLOAD";
     private final int imagetotal = 20;
     private final int imageselected = 6;
     int[] logos = new int[imagetotal];
@@ -78,24 +81,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }));
         bar = findViewById(R.id.progress);
         msg = findViewById(R.id.progressmsg);
+
+        IntentFilter filter=new IntentFilter();
+        filter.addAction(actiondownload);
+        filter.addAction("completed");
+        registerReceiver(br,filter);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
     }
 
-    public void storeImageInStorage(ImageFetcher im, String imgurl, File file) {
-        Log.d("path", file.toString());
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            im.convertImage(imgurl).compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-            fos.close();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
+    private BroadcastReceiver br= new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action=intent.getAction();
+            int x=intent.getIntExtra("index",0);
+            String file=intent.getStringExtra("stringfile");
+            if(action.equals("completed")){
+                loadImage(x, file);
+                if (status == imagetotal) {
+                    bar.setVisibility(View.GONE);
+                    msg.setVisibility(View.GONE);
+                    if (imageClicked.size() == imageselected) {
+                        startbtn.setVisibility(View.VISIBLE);
+                        stopService(new Intent(MainActivity.this,DownloadService.class));
+                    } else {
+                        guide.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
 
-    }
+        }
+    };
+
+//    public void storeImageInStorage(ImageFetcher im, String imgurl, File file) {
+//        Log.d("path", file.toString());
+//        FileOutputStream fos = null;
+//        try {
+//            fos = new FileOutputStream(file);
+//            im.convertImage(imgurl).compress(Bitmap.CompressFormat.JPEG, 100, fos);
+//            fos.flush();
+//            fos.close();
+//        } catch (java.io.IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 
     public void setAdapterState(int index) {
         if (imageClicked.size() < imageselected) {
@@ -185,32 +216,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         msg.setVisibility(View.VISIBLE);
         status = 0;
         bar.setProgress(status * 10);
-
-        thr = new Thread(() -> {
-            while (status < imagetotal) {
-                status++;
-                runOnUiThread(() -> {
-                    loadImage(im, imageurl, status);
-                    if (status == imagetotal) {
-                        bar.setVisibility(View.GONE);
-                        msg.setVisibility(View.GONE);
-                        if (imageClicked.size() == imageselected) {
-                            startbtn.setVisibility(View.VISIBLE);
-                        } else {
-                            guide.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    status = imagetotal;
-                    //e.printStackTrace();
-                }
-            }
-        });
-        thr.start();
-
+        for(int x=1;x<=imagetotal;x++){
+            Intent intent= new Intent(this,DownloadService.class);
+            intent.setAction(actiondownload);
+            intent.putStringArrayListExtra("url",(ArrayList<String>)imageurl);
+            intent.putExtra("index",x);
+            startService(intent);
+        }
     }
 
     private void closeKeyboard() {
@@ -221,28 +233,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private String manualDecode(String url) {
-        if (url.contains("&#x27;")) {
-            url = url.replaceAll("&#x27;", "'");
-        }
-        return url;
-    }
-
-    private void loadImage(ImageFetcher im, List<String> imageurl, int x) {
-        String imgurl = imageurl.get(x - 1);
-        imgurl = manualDecode(imgurl);
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        File file = new File(directory, "image" + x + ".jpg");
-        storeImageInStorage(im, imgurl, file);
+    private void loadImage( int x,String file) {
         View viewitem = simplegrid.getChildAt(x - 1);
         imgbtn = (ImageView) viewitem.findViewById(R.id.imageView);
         imgbtn.setOnClickListener(this);
+        status=x;
 
         bar.setProgress(10 * x);
         String mess = "Downloading " + x + " of " + imagetotal + " images...";
         msg.setText(mess);
-        imgbtn.setBackground(Drawable.createFromPath(file.toString()));
+        imgbtn.setBackground(Drawable.createFromPath(file));
 
     }
 
