@@ -26,7 +26,7 @@ public class ImageFetcher {
 
     }
 
-
+    
     public List<String> extractImage(){
         URL url;
         List<String> dirty=null;
