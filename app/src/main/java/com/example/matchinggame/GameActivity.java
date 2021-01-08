@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -25,7 +26,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.media.SoundPool;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -61,6 +62,9 @@ public class GameActivity extends AppCompatActivity {
     ArrayList<Integer> chosenPosition = new ArrayList<>();
     Handler mainHandler;
     Runnable myRunnable;
+    SoundPool soundPool;
+    int correct, wrong, countdown;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +94,24 @@ public class GameActivity extends AppCompatActivity {
             answerDrawable.add(chosenImagesDrawable.get(answer[i]));
         }
 
-        final MediaPlayer correct = MediaPlayer.create(this, R.raw.correct);
-        final MediaPlayer wrong = MediaPlayer.create(this, R.raw.wrong);
-        final MediaPlayer count = MediaPlayer.create(this, R.raw.countdown);
+        AudioAttributes audioAttributes = new AudioAttributes
+        .Builder()
+        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+        .build();
+        soundPool = new SoundPool
+                .Builder()
+                .setMaxStreams(3)
+                .setAudioAttributes(audioAttributes)
+                .build();
+
+        correct
+                = soundPool.load(this, R.raw.correct,1);
+        wrong
+                = soundPool.load(this, R.raw.wrong, 1);
+        countdown
+                = soundPool.load(this, R.raw.countdown, 1);
+
         gridView = findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
@@ -102,7 +121,7 @@ public class GameActivity extends AppCompatActivity {
         resetButton=(Button)findViewById(R.id.restTapped);
         timer = new Timer();
 
-        activateCountDown(count);
+        activateCountDown(null);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -142,7 +161,8 @@ public class GameActivity extends AppCompatActivity {
                 if (chosenPosition.size() == 2){
                     //compare if match
                     if (answer[chosenPosition.get(0)] == answer[chosenPosition.get(1)]){
-                        correct.start(); // correct sound
+                        soundPool.play(correct, 1, 1, 0, 0, 1); // correct sound
+                        soundPool.pause(correct);
 
                         //make first item not clickable
                         ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
@@ -168,7 +188,8 @@ public class GameActivity extends AppCompatActivity {
                             }
                         };
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
-                        wrong.start(); // wrong sound
+                        soundPool.play(wrong,1,1,0,0,1); // wrong sound
+                        soundPool.pause(wrong);
                         autoClose(parent, mainHandler);
                     }
                 }
@@ -198,17 +219,18 @@ public class GameActivity extends AppCompatActivity {
         mainHandler.postDelayed(myRunnable,3000);
     }
 
-    private void activateCountDown(MediaPlayer count) {
+    private void activateCountDown(SoundPool soundPool) {
         //the countdown feature
         mTextField=findViewById(R.id.countdown);
         new CountDownTimer(4000, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 stopStartButton.setVisibility(View.INVISIBLE);
-                count.start();
+                soundPool.play(countdown, 1,1,0,0,1);
                gridView.setEnabled(false);
                 if((millisUntilFinished)<1000){
                     mTextField.setText("START");
+                    soundPool.pause(countdown);
                 }else{
                     mTextField.setText(""+(millisUntilFinished) / 1000);
                 }
@@ -245,7 +267,6 @@ public class GameActivity extends AppCompatActivity {
                     intentfrom1.putIntegerArrayListExtra("chosenimage",intentfrom1.getIntegerArrayListExtra("chosenimage"));
                     recreate();
                 }
-
             }
         });
         resetAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -254,9 +275,7 @@ public class GameActivity extends AppCompatActivity {
                 //do nothing
             }
         });
-
         resetAlert.show();
-
     }
 
     public void startStopTapped(View view) {
@@ -269,7 +288,7 @@ public class GameActivity extends AppCompatActivity {
         }
         else{
             timerStarted =false;
-            setButtonUI("RESTART", R.color.green);
+            setButtonUI("RESUME", R.color.green);
             gridView.setEnabled(false);
             timerTask.cancel();
         }
@@ -321,5 +340,12 @@ public class GameActivity extends AppCompatActivity {
         //flip back 2nd item
         ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
         secondItem.setImageDrawable(getDrawable(R.drawable.card));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        soundPool.release();
+        getDelegate().onDestroy();
     }
 }
