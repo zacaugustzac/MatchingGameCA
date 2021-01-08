@@ -8,14 +8,13 @@
 
     <Button
         android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@null"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/back"
         android:onClick="back"
-        android:text="BACK"
-        android:textColor="@color/purple_700"
-        android:textSize="20sp"
+        android:textColor="@color/title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:background="@null"
         android:onClick="startStopTapped"
         android:text="START"
@@ -36,15 +35,14 @@
 
     <Button
         android:id="@+id/restTapped"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_gravity="right"
-        android:layout_marginTop="10dp"
-        android:background="@null"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/reset"
         android:onClick="resetTapped"
-        android:text="RESET"
         android:textColor="@color/red"
-        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

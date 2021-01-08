@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -37,7 +36,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private Button fetchbtn;
     private ImageView imgbtn;
-    private Button startbtn;
+    private Button startbtn, mscore;
     private ProgressBar bar;
     private TextView msg;
     private TextView guide;
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
-        enterUrl = (EditText)findViewById(R.id.enteredUrl);
+        enterUrl = (EditText) findViewById(R.id.enteredUrl);
         getPhotoData();
         simplegrid = (GridView) findViewById(R.id.GridView);
         adapter = new CustomAdapter(getApplicationContext(), photoList);
@@ -66,14 +65,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter.notifyDataSetChanged();
         fetchbtn = findViewById(R.id.fetchbtn);
         fetchbtn.setOnClickListener(this);
+        mscore = findViewById(R.id.score);
         guide = findViewById(R.id.guide);
         startbtn = findViewById(R.id.start);
-        startbtn.setOnClickListener((view->{
-            Intent intent= new Intent(this,GameActivity.class);
-            intent.putIntegerArrayListExtra("chosenimage",(ArrayList<Integer>)imageClicked);
+        startbtn.setOnClickListener((view -> {
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putIntegerArrayListExtra("chosenimage", (ArrayList<Integer>) imageClicked);
             startActivity(intent);
 
         }));
+        mscore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
+                startActivity(intent);
+            }
+
+        });
         bar = findViewById(R.id.progress);
         msg = findViewById(R.id.progressmsg);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -95,34 +103,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void setAdapterState(int index){
-        if(imageClicked.size()<imageselected){
+    public void setAdapterState(int index) {
+        if (imageClicked.size() < imageselected) {
             photoList.get(index).setOppositeCheck();
             boolean photoChecked = photoList.get(index).isPhotoChecked();
-            if (photoChecked==true){
+            if (photoChecked == true) {
                 imageClicked.add(index);
-                if(imageClicked.size()==imageselected&&bar.getVisibility()!=View.VISIBLE){
+                if (imageClicked.size() == imageselected && bar.getVisibility() != View.VISIBLE) {
                     startbtn.setVisibility(View.VISIBLE);
                     guide.setVisibility(View.GONE);
                 }
-            }else {
+            } else {
                 for (int i = 0; i < imageClicked.size(); i++) {
-                    if (imageClicked.get(i)==index){
+                    if (imageClicked.get(i) == index) {
                         imageClicked.remove(i);
                     }
                 }
             }
             adapter.notifyDataSetChanged();
-        }else if(imageClicked.size()==imageselected&&photoList.get(index).isPhotoChecked()) {
+        } else if (imageClicked.size() == imageselected && photoList.get(index).isPhotoChecked()) {
             photoList.get(index).setOppositeCheck();
             boolean photoChecked = photoList.get(index).isPhotoChecked();
-            if (photoChecked==true){
+            if (photoChecked == true) {
                 imageClicked.add(index);
-            }else {
+            } else {
                 for (int i = 0; i < imageClicked.size(); i++) {
-                    if (imageClicked.get(i)==index){
+                    if (imageClicked.get(i) == index) {
                         imageClicked.remove(i);
-                        if(bar.getVisibility()!=View.VISIBLE){
+                        if (bar.getVisibility() != View.VISIBLE) {
                             startbtn.setVisibility(View.GONE);
                             guide.setVisibility(View.VISIBLE);
                         }
@@ -130,8 +138,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
             adapter.notifyDataSetChanged();
-        }else {
-            Toast.makeText(this,"Please choose six images!",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Please choose six images!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -142,8 +150,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (view == fetchbtn) {
             fetchImages(url);
-        }
-        else {
+        } else {
             //assign every button click function to update the state of app for having only 6 images
             for (int x = 0; x < imagetotal; x++) {
                 if (view == simplegrid.getChildAt(x).findViewById(R.id.imageView)) {
@@ -154,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void fetchImages(String url) {
-        if(thr!=null){
+        if (thr != null) {
             System.out.println("interupt here");
             thr.interrupt();
         }
@@ -169,10 +176,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startbtn.setVisibility(View.GONE);
         ImageFetcher im = new ImageFetcher(url);
         List<String> imageurl = im.extractImage();
-        if(imageurl==null){
+        if (imageurl == null) {
             Toast.makeText(this, "Invalid url", Toast.LENGTH_SHORT).show();
             return;
-        }else if(imageurl.size()<20){
+        } else if (imageurl.size() < 20) {
             Toast.makeText(this, "Images not sufficient", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -182,17 +189,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         status = 0;
         bar.setProgress(status * 10);
 
-        thr= new Thread (()->{
+        thr = new Thread(() -> {
             while (status < imagetotal) {
                 status++;
-                runOnUiThread(()-> {
+                runOnUiThread(() -> {
                     loadImage(im, imageurl, status);
                     if (status == imagetotal) {
                         bar.setVisibility(View.GONE);
                         msg.setVisibility(View.GONE);
-                        if(imageClicked.size()==imageselected){
+                        if (imageClicked.size() == imageselected) {
                             startbtn.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             guide.setVisibility(View.VISIBLE);
                         }
                     }
@@ -200,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    status=imagetotal;
+                    status = imagetotal;
                     //e.printStackTrace();
                 }
             }
@@ -209,25 +216,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void closeKeyboard(){
+    private void closeKeyboard() {
         View view = this.getCurrentFocus();
-        if(view!=null)
-        {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
-    private String manualDecode(String url){
-        if(url.contains("&#x27;")){
-            url=url.replaceAll("&#x27;","'");
+    private String manualDecode(String url) {
+        if (url.contains("&#x27;")) {
+            url = url.replaceAll("&#x27;", "'");
         }
         return url;
     }
 
     private void loadImage(ImageFetcher im, List<String> imageurl, int x) {
         String imgurl = imageurl.get(x - 1);
-        imgurl=manualDecode(imgurl);
+        imgurl = manualDecode(imgurl);
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
         File file = new File(directory, "image" + x + ".jpg");
