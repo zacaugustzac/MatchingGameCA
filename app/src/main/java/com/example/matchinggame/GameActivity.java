@@ -116,6 +116,9 @@ public class GameActivity extends AppCompatActivity {
                 //record clicked position
                 chosenPosition.add(position);
 
+                //clear handler
+                mainHandler.removeCallbacksAndMessages(null);
+
                 //if second item selected is same as first item
                 if (chosenPosition.size() == 2){
                     if (chosenPosition.get(0) == chosenPosition.get(1)){
@@ -191,7 +194,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void autoClose(AdapterView<?> parent, Handler mainHandler) {
-        mainHandler.removeCallbacksAndMessages(null);
+//        mainHandler.removeCallbacksAndMessages(null);
         mainHandler.postDelayed(myRunnable,3000);
     }
 
