@@ -114,19 +114,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-//    public void storeImageInStorage(ImageFetcher im, String imgurl, File file) {
-//        Log.d("path", file.toString());
-//        FileOutputStream fos = null;
-//        try {
-//            fos = new FileOutputStream(file);
-//            im.convertImage(imgurl).compress(Bitmap.CompressFormat.JPEG, 100, fos);
-//            fos.flush();
-//            fos.close();
-//        } catch (java.io.IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
 
     public void setAdapterState(int index) {
         if (imageClicked.size() < imageselected) {

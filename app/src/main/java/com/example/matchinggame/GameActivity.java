@@ -53,26 +53,26 @@ import java.util.TimerTask;
 
 public class GameActivity extends AppCompatActivity {
 
-    TextView timerText;
-    TextView numberOfMatchesTextView;
-    Button stopStartButton;
-    Button resetButton;
-    GridView gridView;
+    private TextView timerText;
+    private TextView numberOfMatchesTextView;
+    private Button stopStartButton;
+    private Button resetButton;
+    private GridView gridView;
     private int countPair = 0;
-    Timer timerback = new Timer();
-    Timer timer;
-    TimerTask timerTask;
-    Double time= 0.0;
-    AnimatorSet set;
+    private Timer timerback = new Timer();
+    private Timer timer;
+    private TimerTask timerTask;
+    private Double time= 0.0;
+    private AnimatorSet set;
     boolean timerStarted =false;
-    TextView mTextField;
-    Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
-    ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
-    ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
-    ArrayList<Drawable> answerDrawable = new ArrayList<>();
-    ArrayList<Integer> chosenPosition = new ArrayList<>();
-    Handler mainHandler;
-    Runnable myRunnable;
+    private TextView mTextField;
+    private Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
+    private ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
+    private ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
+    private ArrayList<Drawable> answerDrawable = new ArrayList<>();
+    private ArrayList<Integer> chosenPosition = new ArrayList<>();
+    private Handler mainHandler;
+    private Runnable myRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +93,6 @@ public class GameActivity extends AppCompatActivity {
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
             File file = new File(directory, "image"+(chosenImagesArr.get(i)+1)+".jpg");
-//            chosenImages.add( ( (BitmapDrawable)Drawable.createFromPath( file.toString() ) ).getBitmap());
             chosenImagesDrawable.add(Drawable.createFromPath( file.toString() ));
         }
 
@@ -120,7 +119,6 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //show image and set animation
-                //((ImageView)view).setImageDrawable(answerDrawable.get(position));
                 ((ImageView)view).setBackground(answerDrawable.get(position));
                 set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
                 set.setTarget((ImageView) view);
@@ -148,7 +146,6 @@ public class GameActivity extends AppCompatActivity {
                     chosenPosition.add(position);
 
                     //to cover case where 3rd item is one of the first 2 items
-                    //((ImageView)view).setImageDrawable(answerDrawable.get(position));
                     ((ImageView)view).setBackground(answerDrawable.get(position));
 
                 }
@@ -209,7 +206,6 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void autoClose(AdapterView<?> parent, Handler mainHandler) {
-//        mainHandler.removeCallbacksAndMessages(null);
         mainHandler.postDelayed(myRunnable,2000);
     }
 
@@ -241,11 +237,6 @@ public class GameActivity extends AppCompatActivity {
         List<Integer> intList = Arrays.asList(intArray);
         Collections.shuffle(intList);
         return intList.toArray(intArray);
-    }
-
-    public void back(View view){
-        Intent intent = new Intent(this,MainActivity.class);
-        startActivity(intent);
     }
 
 
@@ -308,7 +299,13 @@ public class GameActivity extends AppCompatActivity {
                         String name=input.getText().toString();
                         String time=timerText.getText().toString();
                         sendTheScore(name,time);
-                        finish();
+                        TimerTask task = new TimerTask() {;
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        };
+                        timerback.schedule(task, 1000 * 3);
 
             }
         }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -320,13 +317,6 @@ public class GameActivity extends AppCompatActivity {
         });
         dlg.create().show();
 
-//        TimerTask task = new TimerTask() {;
-//            @Override
-//            public void run() {
-//                finish();
-//            }
-//        };
-//        timerback.schedule(task, 1000 * 20);
     }
 
 
@@ -382,7 +372,7 @@ public class GameActivity extends AppCompatActivity {
                         System.out.println("Response is: "+ response.toString());
                         try {
                             JSONObject result= new JSONObject(response.toString());
-                            Toast.makeText(GameActivity.this,"saved successfully",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GameActivity.this,"Saved successfully",Toast.LENGTH_SHORT).show();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

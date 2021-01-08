@@ -63,7 +63,6 @@ public class ScoreActivity extends AppCompatActivity {
         listing = findViewById(R.id.toplist);
         if (listing != null) {
             listing.setAdapter(adp);
-            //listing.setOnItemClickListener(this);
         }
 
 
