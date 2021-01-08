@@ -52,7 +52,8 @@ public class ImageAdapter extends BaseAdapter {
         else imageView = (ImageView)convertView;
 
 
-        imageView.setImageResource(R.drawable.card);
+//        imageView.setImageResource(R.drawable.card);
+        imageView.setBackgroundResource(R.drawable.card);
 
 
         return imageView;
