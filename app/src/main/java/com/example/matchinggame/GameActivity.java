@@ -184,6 +184,7 @@ public class GameActivity extends AppCompatActivity {
                         };
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
                         wrong.start(); // wrong sound
+                        autoClose(parent, mainHandler);
                     }
                 }
 
@@ -205,6 +206,11 @@ public class GameActivity extends AppCompatActivity {
             timerTask.cancel();
         }
         promptUser();
+    }
+
+    private void autoClose(AdapterView<?> parent, Handler mainHandler) {
+//        mainHandler.removeCallbacksAndMessages(null);
+        mainHandler.postDelayed(myRunnable,2000);
     }
 
     private void activateCountDown(MediaPlayer count) {
