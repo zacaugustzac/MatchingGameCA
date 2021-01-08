@@ -14,6 +14,8 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -57,7 +59,8 @@ public class GameActivity extends AppCompatActivity {
     ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
     ArrayList<Drawable> answerDrawable = new ArrayList<>();
     ArrayList<Integer> chosenPosition = new ArrayList<>();
-    boolean newMismatch = false;
+    Handler mainHandler;
+    Runnable myRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,9 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
         answer = shuffle(answer);        //shuffle answer
+
+        //prepare mainHandler and runnable
+        mainHandler = new Handler(Looper.getMainLooper()); //set mainHandler
 
         //get intent get chosen images arr from MainActivity
         Intent intent = getIntent();
@@ -120,13 +126,7 @@ public class GameActivity extends AppCompatActivity {
 
                 //if clicked 3rd item
                 if (chosenPosition.size() == 3) {
-                    //flip back first item
-                    ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
-                    firstItem.setImageDrawable(getDrawable(R.drawable.card));
-
-                    //flip back 2nd item
-                    ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
-                    secondItem.setImageDrawable(getDrawable(R.drawable.card));
+                    closeTwoCards(parent);
 
                     chosenPosition.clear();
                     chosenPosition.add(position);
@@ -158,8 +158,15 @@ public class GameActivity extends AppCompatActivity {
                         chosenPosition.clear();
                     }
                     else{ //if mismatch
+                        myRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                    closeTwoCards(parent);
+                            }
+                        };
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
                         wrong.start(); // wrong sound
+                        autoClose(parent, mainHandler);
                     }
                 }
 
@@ -181,8 +188,11 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-
+    private void autoClose(AdapterView<?> parent, Handler mainHandler) {
+        mainHandler.removeCallbacksAndMessages(null);
+        mainHandler.postDelayed(myRunnable,3000);
     }
 
     private void activateCountDown(MediaPlayer count) {
@@ -219,7 +229,6 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = new Intent(this,MainActivity.class);
         startActivity(intent);
     }
-
 
     public void resetTapped(View view){
         AlertDialog.Builder resetAlert = new AlertDialog.Builder(this);
@@ -268,9 +277,8 @@ public class GameActivity extends AppCompatActivity {
         stopStartButton.setTextColor(ContextCompat.getColor(this, color));
     }
 
-
-    private void startTimer()
-    {   stopStartButton.setVisibility(View.VISIBLE);
+    private void startTimer() {
+        stopStartButton.setVisibility(View.VISIBLE);
         timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -297,9 +305,18 @@ public class GameActivity extends AppCompatActivity {
         return formatTime(seconds,minutes,hours);
     }
 
-
     private String formatTime(int seconds, int minutes, int hours)
     {
         return String.format("%02d",hours)+" : "+ String.format("%02d",minutes)+" : "+ String.format("%02d",seconds);
+    }
+
+    public void closeTwoCards(AdapterView<?> parent){
+        //flip back first item
+        ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
+        firstItem.setImageDrawable(getDrawable(R.drawable.card));
+
+        //flip back 2nd item
+        ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
+        secondItem.setImageDrawable(getDrawable(R.drawable.card));
     }
 }
