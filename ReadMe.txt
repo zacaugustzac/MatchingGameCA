@@ -12,7 +12,8 @@ Kevin Aditya:
 
 
 Wang Dongyang:
-
+- URL input to fetch images
+- URL validation
 
 Low Huai Zhong:
 
