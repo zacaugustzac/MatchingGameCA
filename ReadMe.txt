@@ -1,5 +1,6 @@
 Gao Keqian:
-
+- Select 6 images (onClick, select image, if image already selected, click to deselect)
+- Show 20 images in gridView layout
 
 Kevin Aditya:
 - store the 20 images from the url given
@@ -19,7 +20,7 @@ Low Huai Zhong:
 
 
 Huan Xinyue:
-- timer functin (start.pause,restart,reset)
+- timer function (start.pause,restart,reset)
 - reset the game function
 - show the selected 12 images through grid view
 - modify all layouts
