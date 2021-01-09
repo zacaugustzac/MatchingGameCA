@@ -121,7 +121,7 @@ public class GameActivity extends AppCompatActivity {
         resetButton=(Button)findViewById(R.id.restTapped);
         timer = new Timer();
 
-        activateCountDown(null);
+        activateCountDown(soundPool);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

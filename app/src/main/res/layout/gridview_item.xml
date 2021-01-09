@@ -29,6 +29,6 @@
         android:layout_gravity="right|bottom"
         android:layout_marginBottom="4dp"
         android:layout_marginRight="4dp"
-        android:src="@drawable/non_selected" />
+        android:src="@drawable/non_selected"/>
 
 </RelativeLayout>
