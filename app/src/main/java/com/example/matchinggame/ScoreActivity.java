@@ -46,7 +46,7 @@ public class ScoreActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                             adp.setData(result);
-                            Toast.makeText(ScoreActivity.this,"retrieved successfully",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ScoreActivity.this,"Retrieved successfully",Toast.LENGTH_SHORT).show();
                         }
                     },new Response.ErrorListener() {
                 @Override
