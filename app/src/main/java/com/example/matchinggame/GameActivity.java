@@ -195,6 +195,13 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        timerTask.cancel();
+        setButtonUI("RESTART", R.color.green);
+    }
+
     private void winningCondition() {
         Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
         if(timerStarted == true){
