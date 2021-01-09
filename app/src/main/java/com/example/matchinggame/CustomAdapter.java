@@ -1,6 +1,7 @@
 package com.example.matchinggame;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,13 +39,14 @@ public class CustomAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.i("c.e.m.CustomAdapter", "Entering CustomAdapter getView");
         ViewHolder viewHolder = null;
 
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.gridview_item, null);
             viewHolder = new ViewHolder();
 
-            viewHolder.photos = (ImageView) convertView.findViewById(R.id.imageView);
+            viewHolder.photos = (PhotoFrame) convertView.findViewById(R.id.imageView);
 
             viewHolder.check = (ImageView) convertView.findViewById(R.id.check);
             convertView.setTag(viewHolder);
@@ -54,7 +56,7 @@ public class CustomAdapter extends BaseAdapter {
         }
 
         viewHolder.photos.setImageResource(getItem(position).getPhotoId());
-        if (getItem(position).isPhotoChecked()) {
+        if (viewHolder.photos.getImage().isPhotoChecked()) {
             viewHolder.check.setImageResource(R.drawable.selected);
         }
 
@@ -65,7 +67,7 @@ public class CustomAdapter extends BaseAdapter {
     }
 
     protected class ViewHolder {
-        ImageView photos;
+        PhotoFrame photos;
         ImageView check;
     }
 }

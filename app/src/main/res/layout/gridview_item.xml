@@ -6,13 +6,21 @@
     android:descendantFocusability="blocksDescendants"
     >
 
-    <ImageView
+    <com.example.matchinggame.PhotoFrame
         android:id="@+id/imageView"
         android:layout_width="60dp"
         android:layout_height="80dp"
         android:layout_centerInParent="true"
         android:background="@drawable/card"
         />
+
+    <!--<ImageView
+        android:id="@+id/imageView"
+        android:layout_width="60dp"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/card"
+        /> -->
 
     <ImageView
         android:id="@+id/check"
