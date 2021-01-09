@@ -21,6 +21,12 @@ Huan Xinyue:
 
 
 Li Rang:
+- flipping animation, matching and mismatching sound effects
+- set cards unclickable after pausing the game and clickable after restarting
+- set Start button invisible during countdown period and visible when game starts
+- set reset button unclickable after winning the game
+- pause timer automatically after pressing main button and continue after returning 
+
 
 
 Sharon Chien:
