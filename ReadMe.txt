@@ -18,7 +18,10 @@ Low Huai Zhong:
 
 
 Huan Xinyue:
-
+- timer functin (start.pause,restart,reset)
+- reset the game function
+- show the selected 12 images through grid view
+- modify all layouts
 
 Li Rang:
 - flipping animation, matching and mismatching sound effects
