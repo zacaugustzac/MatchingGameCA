@@ -8,8 +8,8 @@
 
     <View
         android:id="@+id/btn"
-        android:layout_width="91dp"
-        android:layout_height="49dp"
+        android:layout_width="99dp"
+        android:layout_height="47dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="12dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -17,31 +17,29 @@
 
     <Button
         android:id="@+id/fetchbtn"
-        android:layout_width="82dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="1dp"
-        android:background="#7CB9EA"
-        android:text="Fetch"
-        android:textColor="#FFFFFF"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/search"
         app:layout_constraintEnd_toEndOf="@+id/btn"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/btn"
         app:layout_constraintTop_toTopOf="@+id/btn" />
 
     <View
         android:id="@+id/url"
-        android:layout_width="0dp"
+        android:layout_width="250dp"
         android:layout_height="49dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintEnd_toStartOf="@+id/btn"
+        app:layout_constraintHorizontal_bias="0.218"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/enteredUrl"
-        android:layout_width="286dp"
+        android:layout_width="266dp"
         android:layout_height="46dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
         android:text="https://stocksnap.io/search/"
         android:textColorHint="@color/hint"
         app:layout_constraintBottom_toBottomOf="@+id/url"
@@ -123,11 +121,22 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:numColumns="4"
+        android:layout_marginLeft="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/gridview"
         app:layout_constraintEnd_toEndOf="@+id/gridview"
         app:layout_constraintHorizontal_bias="0.611"
         app:layout_constraintStart_toStartOf="@+id/gridview"
         app:layout_constraintTop_toTopOf="@+id/gridview"
         app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/score"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/prizecup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
