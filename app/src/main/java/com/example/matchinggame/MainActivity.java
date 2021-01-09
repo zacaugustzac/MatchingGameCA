@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         enterUrl = (EditText)findViewById(R.id.enteredUrl);
-        getPhotoData();
+        photoList = Arrays.asList(getPhotoData());
         simplegrid = (GridView) findViewById(R.id.GridView);
         adapter = new CustomAdapter(getApplicationContext(), photoList);
         simplegrid.setAdapter(adapter);
@@ -241,12 +242,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void getPhotoData() {
+    private Photo[] getPhotoData() {
 
+        Photo[] photos = new Photo[imagetotal];
         photoList = new ArrayList<Photo>();
         for (int i = 0; i < imagetotal; i++) {
-            Photo photo = new Photo(logos[i], false);
-            photoList.add(photo);
+            photos[i] = new Photo(logos[i], false);
         }
+        return photos;
     }
 }
