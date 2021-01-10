@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -61,7 +62,6 @@ public class GameActivity extends AppCompatActivity {
 
 
     private GameTimer timerText;
-    private TextView timerText;
     private TextView numberOfMatchesTextView;
     private Button stopStartButton;
     private Button resetButton;
@@ -214,31 +214,19 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        timerTask.cancel();
         setButtonUI("RESTART", R.color.green);
     }
     @Override
     protected  void onRestart() {
         super.onRestart();
-        startTimer();
         setButtonUI("PAUSE", R.color.red);
-    }
-
-    private void winningCondition() {
-        Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
-        if(timerStarted == true){
-            stopStartButton.setEnabled(false);
-            resetButton.setEnabled(false);
-            timerTask.cancel();
-        }
-        promptUser();
     }
 
     private void autoClose(AdapterView<?> parent, Handler mainHandler) {
         mainHandler.postDelayed(myRunnable,2000);
     }
 
-    private void activateCountDown(MediaPlayer count) {
+    private void activateCountDown(SoundPool soundPool) {
         //the countdown feature
         mTextField=findViewById(R.id.countdown);
         PreGameCountdown countdownTimer = new PreGameCountdown();
