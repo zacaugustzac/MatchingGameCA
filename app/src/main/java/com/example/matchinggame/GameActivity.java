@@ -31,6 +31,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.matchinggame.game.SoundLibrary;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,8 +64,7 @@ public class GameActivity extends AppCompatActivity {
     ArrayList<Integer> chosenPosition = new ArrayList<>();
     Handler mainHandler;
     Runnable myRunnable;
-    SoundPool soundPool;
-    int correct, wrong, countdown;
+    SoundLibrary sounds;
 
 
     @Override
@@ -94,23 +95,7 @@ public class GameActivity extends AppCompatActivity {
             answerDrawable.add(chosenImagesDrawable.get(answer[i]));
         }
 
-        AudioAttributes audioAttributes = new AudioAttributes
-        .Builder()
-        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
-        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-        .build();
-        soundPool = new SoundPool
-                .Builder()
-                .setMaxStreams(3)
-                .setAudioAttributes(audioAttributes)
-                .build();
-
-        correct
-                = soundPool.load(this, R.raw.correct,1);
-        wrong
-                = soundPool.load(this, R.raw.wrong, 1);
-        countdown
-                = soundPool.load(this, R.raw.countdown, 1);
+        sounds = new SoundLibrary(this);
 
         gridView = findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
@@ -121,7 +106,7 @@ public class GameActivity extends AppCompatActivity {
         resetButton=(Button)findViewById(R.id.restTapped);
         timer = new Timer();
 
-        activateCountDown(soundPool);
+        activateCountDown(sounds.soundPool);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -161,8 +146,7 @@ public class GameActivity extends AppCompatActivity {
                 if (chosenPosition.size() == 2){
                     //compare if match
                     if (answer[chosenPosition.get(0)] == answer[chosenPosition.get(1)]){
-                        soundPool.play(correct, 1, 1, 0, 0, 1); // correct sound
-                        soundPool.pause(correct);
+                        sounds.play(sounds.correct); // correct sound
 
                         //make first item not clickable
                         ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
@@ -188,8 +172,7 @@ public class GameActivity extends AppCompatActivity {
                             }
                         };
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
-                        soundPool.play(wrong,1,1,0,0,1); // wrong sound
-                        soundPool.pause(wrong);
+                        sounds.play(sounds.wrong);
                         autoClose(parent, mainHandler);
                     }
                 }
@@ -226,11 +209,11 @@ public class GameActivity extends AppCompatActivity {
 
             public void onTick(long millisUntilFinished) {
                 stopStartButton.setVisibility(View.INVISIBLE);
-                soundPool.play(countdown, 1,1,0,0,1);
+                sounds.soundPool.play(sounds.countdown,1,1,0,0,1);
                gridView.setEnabled(false);
                 if((millisUntilFinished)<1000){
                     mTextField.setText("START");
-                    soundPool.pause(countdown);
+                    sounds.soundPool.pause(sounds.countdown);
                 }else{
                     mTextField.setText(""+(millisUntilFinished) / 1000);
                 }
@@ -345,7 +328,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        soundPool.release();
+        sounds.release();
         getDelegate().onDestroy();
     }
 }
