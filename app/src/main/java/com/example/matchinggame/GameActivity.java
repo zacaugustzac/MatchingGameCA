@@ -100,7 +100,7 @@ public class GameActivity extends AppCompatActivity {
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
 
-        timerText =(GameTimer) findViewById(R.id.timerText);
+        timerText =((GameTimer) findViewById(R.id.timerText)).withRunOnUIFunction(task -> runOnUiThread(task));
         stopStartButton=(Button)findViewById(R.id.startStopButton);
         resetButton=(Button)findViewById(R.id.restTapped);
 
