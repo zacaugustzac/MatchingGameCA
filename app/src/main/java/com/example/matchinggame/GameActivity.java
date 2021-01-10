@@ -31,6 +31,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.matchinggame.game.GameTimer;
+import com.example.matchinggame.game.PreGameCountdown;
 import com.example.matchinggame.game.SoundLibrary;
 
 import java.io.File;
@@ -44,18 +46,15 @@ import java.util.TimerTask;
 
 public class GameActivity extends AppCompatActivity {
 
-    TextView timerText;
+    GameTimer timerText;
     TextView numberOfMatchesTextView;
     Button stopStartButton;
     Button resetButton;
     GridView gridView;
     private int countPair = 0;
-    Timer timerback = new Timer();
-    Timer timer;
-    TimerTask timerTask;
-    Double time= 0.0;
     AnimatorSet set;
     boolean timerStarted =false;
+    Timer timerback = new Timer();
     TextView mTextField;
     Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
     ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
@@ -101,10 +100,9 @@ public class GameActivity extends AppCompatActivity {
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
 
-        timerText =(TextView) findViewById(R.id.timerText);
+        timerText =(GameTimer) findViewById(R.id.timerText);
         stopStartButton=(Button)findViewById(R.id.startStopButton);
         resetButton=(Button)findViewById(R.id.restTapped);
-        timer = new Timer();
 
         activateCountDown(sounds.soundPool);
 
@@ -183,7 +181,7 @@ public class GameActivity extends AppCompatActivity {
                     if(timerStarted == true){
                         stopStartButton.setEnabled(false);
                         resetButton.setEnabled(false);
-                        timerTask.cancel();
+                        timerText.stop();
                     }
                     TimerTask task = new TimerTask() {;
                         @Override
@@ -205,25 +203,23 @@ public class GameActivity extends AppCompatActivity {
     private void activateCountDown(SoundPool soundPool) {
         //the countdown feature
         mTextField=findViewById(R.id.countdown);
-        new CountDownTimer(4000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-                stopStartButton.setVisibility(View.INVISIBLE);
-                sounds.soundPool.play(sounds.countdown,1,1,0,0,1);
-               gridView.setEnabled(false);
-                if((millisUntilFinished)<1000){
-                    mTextField.setText("START");
-                    sounds.soundPool.pause(sounds.countdown);
-                }else{
-                    mTextField.setText(""+(millisUntilFinished) / 1000);
+        PreGameCountdown countdownTimer = new PreGameCountdown();
+        countdownTimer.onTick(
+                millisUntilFinished -> {
+                    stopStartButton.setVisibility(View.INVISIBLE);
+                    soundPool.play(sounds.countdown,1,1,0,0,1);
+                    gridView.setEnabled(false);
+                    if((millisUntilFinished)<1000){
+                        mTextField.setText("START");
+                        sounds.soundPool.pause(sounds.countdown);
+                    }else{
+                        mTextField.setText(""+(millisUntilFinished) / 1000);
+                    }
                 }
-            }
-
-            public void onFinish() {
-                startStopTapped(findViewById(R.id.startStopButton));
-                mTextField.setVisibility(View.GONE);
-            }
-        }.start();
+        ).onFinish(()-> {
+            startStopTapped(findViewById(R.id.startStopButton));
+            mTextField.setVisibility(View.GONE);
+        }).start();
     }
 
     //to shuffle the answer
@@ -245,7 +241,7 @@ public class GameActivity extends AppCompatActivity {
         resetAlert.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
-                if(timerTask != null){
+                if(timerText.tsk != null){
                     Intent intentfrom1= getIntent();
                     intentfrom1.putIntegerArrayListExtra("chosenimage",intentfrom1.getIntegerArrayListExtra("chosenimage"));
                     recreate();
@@ -273,7 +269,7 @@ public class GameActivity extends AppCompatActivity {
             timerStarted =false;
             setButtonUI("RESUME", R.color.green);
             gridView.setEnabled(false);
-            timerTask.cancel();
+            timerText.stop();
         }
     }
 
@@ -284,35 +280,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void startTimer() {
         stopStartButton.setVisibility(View.VISIBLE);
-        timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        time++;
-                        timerText.setText(getTimerText());
-                    }
-                });
-            }
-        };
-        timer.scheduleAtFixedRate(timerTask,0,1000);
-    }
-
-    private String getTimerText()
-    {
-        int rounded =(int) Math.round(time);
-
-        int seconds =((rounded%86400)%3600)%60;
-        int minutes =((rounded%86400)%3600)/60;
-        int hours =((rounded%86400)/3600);
-
-        return formatTime(seconds,minutes,hours);
-    }
-
-    private String formatTime(int seconds, int minutes, int hours)
-    {
-        return String.format("%02d",hours)+" : "+ String.format("%02d",minutes)+" : "+ String.format("%02d",seconds);
+        runOnUiThread(timerText);
     }
 
     public void closeTwoCards(AdapterView<?> parent){
