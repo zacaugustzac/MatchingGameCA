@@ -55,7 +55,7 @@ public class CustomAdapter extends BaseAdapter {
 
         }
 
-        viewHolder.photos.setImageResource(getItem(position).getPhotoId());
+        viewHolder.photos.setImageResource(0);
         if (viewHolder.photos.getImage().isPhotoChecked()) {
             viewHolder.check.setImageResource(R.drawable.selected);
         }
