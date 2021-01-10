@@ -34,6 +34,7 @@ import static java.util.stream.Collectors.toList;
 
 public class TempMainActivity extends AppCompatActivity {
     private Button fetchbtn;
+    private ImageView imgbtn;
     private Button startbtn;
     private Button mscore;
     private ProgressBar bar;
@@ -42,15 +43,14 @@ public class TempMainActivity extends AppCompatActivity {
     int status;
     private String actiondownload="DOWNLOAD";
     private final int imagetotal = 20;
-    private final int selectableLimit = 6;
+    private final int imageselected = 6;
     int[] logos = new int[imagetotal];
     private GridView simplegrid;
     private List<PhotoId> imageClicked = new ArrayList<PhotoId>();
     private List<Photo> photoList;
     private CustomAdapter adapter;
-    Thread thr;
+    //Thread thr;
     EditText enterUrl;
-    private BroadcastReceiver br;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,68 +68,56 @@ public class TempMainActivity extends AppCompatActivity {
         fetchbtn.setOnClickListener(notUsed -> fetchImages());
         mscore = findViewById(R.id.score);
         mscore.setOnClickListener(notUsed -> {
-            Intent intent = new Intent(TempMainActivity.this, ScoreActivity.class);
-            startActivity(intent);
-        });
+                    Intent intent = new Intent(TempMainActivity.this, ScoreActivity.class);
+                    startActivity(intent);
+                });
         guide = findViewById(R.id.guide);
         startbtn = findViewById(R.id.start);
         startbtn.setOnClickListener((view->{
-            Intent intent= new Intent(this, GameActivity.class);
+            Intent intent= new Intent(this,GameActivity.class);
             List<Integer> transferValues = imageClicked.stream().map(pid -> pid.value).collect(toList());
             intent.putIntegerArrayListExtra("chosenimage", new ArrayList<>(transferValues));
             startActivity(intent);
+
         }));
         bar = findViewById(R.id.progress);
         msg = findViewById(R.id.progressmsg);
-        br= new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action=intent.getAction();
-                int x=intent.getIntExtra("index",0);
-                String file=intent.getStringExtra("stringfile");
-                if(action.equals("completed")){
-                    loadImage(x, file);
-                    if (status == imagetotal) {
-                        bar.setVisibility(View.GONE);
-                        msg.setVisibility(View.GONE);
-                        if (imageClicked.size() == selectableLimit) {
-                            startbtn.setVisibility(View.VISIBLE);
-                            stopService(new Intent(TempMainActivity.this,DownloadService.class));
-                        } else {
-                            guide.setVisibility(View.VISIBLE);
-                        }
-                    }
-                }
-
-            }
-        };
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
     }
 
-    /*public void storeImageInStorage(ImageFetcher im, String imgurl, File file) {
-        Log.d("path", file.toString());
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            im.convertImage(imgurl).compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-            fos.close();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
+    private BroadcastReceiver br= new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action=intent.getAction();
+            int x=intent.getIntExtra("index",0);
+            String file=intent.getStringExtra("stringfile");
+            if(action.equals("completed")){
+                loadImage(x, file);
+                if (status == imagetotal) {
+                    bar.setVisibility(View.GONE);
+                    msg.setVisibility(View.GONE);
+                    if (imageClicked.size() == imageselected) {
+                        startbtn.setVisibility(View.VISIBLE);
+                        stopService(new Intent(TempMainActivity.this,DownloadService.class));
+                    } else {
+                        guide.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
 
-    }*/
+        }
+    };
 
     public void setAdapterState(View view){
         Photo myPhoto = ((PhotoFrame) view).getImage();
         myPhoto.setOppositeCheck();
         int numSelected = imageClicked.size();
-        if(numSelected==selectableLimit){
+        if(numSelected== imageselected){
             startbtn.setVisibility(View.VISIBLE);
             guide.setVisibility(View.GONE);
-        } else if (numSelected>selectableLimit){
+        } else if (numSelected> imageselected){
             myPhoto.setOppositeCheck();
         } else {
             Toast.makeText(this,"Please choose six images!",Toast.LENGTH_SHORT).show();
@@ -184,22 +172,9 @@ public class TempMainActivity extends AppCompatActivity {
         }
     }
 
-    private String manualDecode(String url){
-        if(url.contains("&#x27;")){
-            url=url.replaceAll("&#x27;","'");
-        }
-        return url;
-    }
-
-    /*private void loadImage(ImageFetcher im, List<String> imageurl, int x) {
+    private void loadImage(int x,String file) {
         int id = x-1;
         Log.i("MainActivity.loadImage", "Loading image " + id);
-        String imgurl = imageurl.get(id);
-        imgurl=manualDecode(imgurl);
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        File file = new File(directory, "image" + x + ".jpg");
-        storeImageInStorage(im, imgurl, file);
         View viewitem = simplegrid.getChildAt(id);
         PhotoFrame imgbtn = (PhotoFrame) viewitem.findViewById(R.id.imageView);
         Photo image = photoList.get(id);
@@ -212,25 +187,6 @@ public class TempMainActivity extends AppCompatActivity {
         bar.setProgress(10 * x);
         String mess = "Downloading " + x + " of " + imagetotal + " images...";
         msg.setText(mess);
-        imgbtn.setBackground(Drawable.createFromPath(file.toString()));
-
-    }*/
-
-    private void loadImage( int x,String file) {
-        int id = x-1;
-        View viewitem = simplegrid.getChildAt(id);
-        PhotoFrame imgbtn = (PhotoFrame) viewitem.findViewById(R.id.imageView);
-        Photo image = photoList.get(id);
-        imgbtn.setImage(image);
-        imgbtn.setOnClickListener(self -> {
-            Log.d("MainActivity.Image OnClick #" + id, "Setting Adapter State");
-            setAdapterState(self);
-        });
-        status=x;
-
-        bar.setProgress(10 * x);
-        String mess = "Downloading " + x + " of " + imagetotal + " images...";
-        msg.setText(mess);
         imgbtn.setBackground(Drawable.createFromPath(file));
     }
 
@@ -240,14 +196,16 @@ public class TempMainActivity extends AppCompatActivity {
         Photo[] photos = new Photo[imagetotal];
         photoList = new ArrayList<Photo>();
         for (int i = 0; i < imagetotal; i++) {
-            PhotoId photoId = new PhotoId(logos[i]);
+            PhotoId photoId = new PhotoId(i);
             Photo p = new Photo(photoId.value, false);
             p.setOnToggleListener(selecting -> {
                 if(selecting) {
                     imageClicked.add(photoId);
+                    Log.i("MainActivity Click", imageClicked.toString());
                     Log.d("MainActivity Click", "Added #" + photoId);
                 } else {
                     imageClicked.remove(photoId);
+                    Log.i("MainActivity Click", imageClicked.toString());
                     Log.d("MainActivity Click", "Removed #" + photoId);
                 }
             });
