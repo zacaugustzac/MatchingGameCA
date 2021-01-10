@@ -1,16 +1,21 @@
 package com.example.matchinggame;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -25,7 +30,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import static java.util.stream.Collectors.toList;
+
+public class MainActivity extends AppCompatActivity {
     private Button fetchbtn;
     private ImageView imgbtn;
     private Button startbtn;
@@ -36,16 +43,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int status;
     private String actiondownload="DOWNLOAD";
     private final int imagetotal = 20;
-<<<<<<< HEAD
-    private final int selectableLimit = 6;
-=======
     private final int imageselected = 6;
     int[] logos = new int[imagetotal];
->>>>>>> Sharon4
     private GridView simplegrid;
-    private List<Integer> imageClicked = new ArrayList<Integer>();
+    private List<PhotoId> imageClicked = new ArrayList<PhotoId>();
     private List<Photo> photoList;
     private CustomAdapter adapter;
+    //Thread thr;
     EditText enterUrl;
 
     @Override
@@ -54,31 +58,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
-        enterUrl = (EditText) findViewById(R.id.enteredUrl);
-        getPhotoData();
+        enterUrl = (EditText)findViewById(R.id.enteredUrl);
+        photoList = Arrays.asList(getPhotoData());
         simplegrid = (GridView) findViewById(R.id.GridView);
         adapter = new CustomAdapter(getApplicationContext(), photoList);
         simplegrid.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         fetchbtn = findViewById(R.id.fetchbtn);
-        fetchbtn.setOnClickListener(this);
+        fetchbtn.setOnClickListener(notUsed -> fetchImages());
         mscore = findViewById(R.id.score);
-        mscore.setOnClickListener(this);
+        mscore.setOnClickListener(notUsed -> {
+            Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
+            startActivity(intent);
+        });
         guide = findViewById(R.id.guide);
         startbtn = findViewById(R.id.start);
-        startbtn.setOnClickListener((view -> {
-            Intent intent = new Intent(this, GameActivity.class);
-            intent.putIntegerArrayListExtra("chosenimage", (ArrayList<Integer>) imageClicked);
+        startbtn.setOnClickListener((view->{
+            Intent intent= new Intent(this,GameActivity.class);
+            List<Integer> transferValues = imageClicked.stream().map(pid -> pid.value).collect(toList());
+            intent.putIntegerArrayListExtra("chosenimage", new ArrayList<>(transferValues));
             startActivity(intent);
 
         }));
         bar = findViewById(R.id.progress);
         msg = findViewById(R.id.progressmsg);
-
-        IntentFilter filter=new IntentFilter();
-        filter.addAction(actiondownload);
-        filter.addAction("completed");
-        registerReceiver(br,filter);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -107,65 +110,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-
-    public void setAdapterState(int index) {
-        if (imageClicked.size() < imageselected) {
-            photoList.get(index).setOppositeCheck();
-            boolean photoChecked = photoList.get(index).isPhotoChecked();
-            if (photoChecked == true) {
-                imageClicked.add(index);
-                if (imageClicked.size() == imageselected && bar.getVisibility() != View.VISIBLE) {
-                    startbtn.setVisibility(View.VISIBLE);
-                    guide.setVisibility(View.GONE);
-                }
-            } else {
-                for (int i = 0; i < imageClicked.size(); i++) {
-                    if (imageClicked.get(i) == index) {
-                        imageClicked.remove(i);
-                    }
-                }
-            }
-            adapter.notifyDataSetChanged();
-        } else if (imageClicked.size() == imageselected && photoList.get(index).isPhotoChecked()) {
-            photoList.get(index).setOppositeCheck();
-            boolean photoChecked = photoList.get(index).isPhotoChecked();
-            if (photoChecked == true) {
-                imageClicked.add(index);
-            } else {
-                for (int i = 0; i < imageClicked.size(); i++) {
-                    if (imageClicked.get(i) == index) {
-                        imageClicked.remove(i);
-                        if (bar.getVisibility() != View.VISIBLE) {
-                            startbtn.setVisibility(View.GONE);
-                            guide.setVisibility(View.VISIBLE);
-                        }
-                    }
-                }
-            }
-            adapter.notifyDataSetChanged();
+    public void setAdapterState(View view){
+        Photo myPhoto = ((PhotoFrame) view).getImage();
+        myPhoto.setOppositeCheck();
+        int numSelected = imageClicked.size();
+        if(numSelected== imageselected){
+            startbtn.setVisibility(View.VISIBLE);
+            guide.setVisibility(View.GONE);
+        } else if (numSelected> imageselected){
+            myPhoto.setOppositeCheck();
         } else {
-            Toast.makeText(this, "Please choose six images!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Please choose six images!",Toast.LENGTH_SHORT).show();
         }
+        adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onClick(View view) {
-
+    private void fetchImages(){
         String url = enterUrl.getText().toString();
-
-        if (view == fetchbtn) {
-            fetchImages(url);
-        } else if(view==mscore){
-            Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
-            startActivity(intent);
-        } else {
-            //assign every button click function to update the state of app for having only 6 images
-            for (int x = 0; x < imagetotal; x++) {
-                if (view == simplegrid.getChildAt(x).findViewById(R.id.imageView)) {
-                    setAdapterState(x);
-                }
-            }
-        }
+        fetchImages(url);
     }
 
     private void fetchImages(String url) {
@@ -201,33 +163,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void closeKeyboard() {
+    private void closeKeyboard(){
         View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(view!=null)
+        {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
-    private void loadImage( int x,String file) {
-        View viewitem = simplegrid.getChildAt(x - 1);
-        imgbtn = (ImageView) viewitem.findViewById(R.id.imageView);
-        imgbtn.setOnClickListener(this);
-        status=x;
-
+    private void loadImage(int x,String file) {
+        int id = x-1;
+        Log.i("MainActivity.loadImage", "Loading image " + id);
+        View viewitem = simplegrid.getChildAt(id);
+        PhotoFrame imgbtn = (PhotoFrame) viewitem.findViewById(R.id.imageView);
+        Photo image = photoList.get(id);
+        imgbtn.setImage(image);
+        //imgbtn.setOnClickListener(this);
+        imgbtn.setOnClickListener(self -> {
+            Log.d("MainActivity.Image OnClick #" + id, "Setting Adapter State");
+            setAdapterState(self);
+        });
         bar.setProgress(10 * x);
         String mess = "Downloading " + x + " of " + imagetotal + " images...";
         msg.setText(mess);
         imgbtn.setBackground(Drawable.createFromPath(file));
-
     }
 
 
-    private void getPhotoData() {
+    private Photo[] getPhotoData() {
 
+        Photo[] photos = new Photo[imagetotal];
         photoList = new ArrayList<Photo>();
         for (int i = 0; i < imagetotal; i++) {
-<<<<<<< HEAD
             PhotoId photoId = new PhotoId(i);
             Photo p = new Photo(photoId.value, false);
             p.setOnToggleListener(selecting -> {
@@ -242,10 +210,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
             photos[i] = p;
-=======
-            Photo photo = new Photo(logos[i], false);
-            photoList.add(photo);
->>>>>>> Sharon4
         }
+        return photos;
     }
 }
