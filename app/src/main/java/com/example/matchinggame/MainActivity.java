@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     int status;
     private final int imagetotal = 20;
     private final int selectableLimit = 6;
-    int[] logos = new int[imagetotal];
     private GridView simplegrid;
     private List<PhotoId> imageClicked = new ArrayList<PhotoId>();
     private List<Photo> photoList;
@@ -216,14 +215,16 @@ public class MainActivity extends AppCompatActivity {
         Photo[] photos = new Photo[imagetotal];
         photoList = new ArrayList<Photo>();
         for (int i = 0; i < imagetotal; i++) {
-            PhotoId photoId = new PhotoId(logos[i]);
+            PhotoId photoId = new PhotoId(i);
             Photo p = new Photo(photoId.value, false);
             p.setOnToggleListener(selecting -> {
                 if(selecting) {
                     imageClicked.add(photoId);
+                    Log.i("MainActivity Click", imageClicked.toString());
                     Log.d("MainActivity Click", "Added #" + photoId);
                 } else {
                     imageClicked.remove(photoId);
+                    Log.i("MainActivity Click", imageClicked.toString());
                     Log.d("MainActivity Click", "Removed #" + photoId);
                 }
             });
