@@ -2,51 +2,27 @@ package com.example.matchinggame;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
-import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
+import android.media.AudioAttributes;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.media.SoundPool;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-
-import com.example.matchinggame.game.GameTimer;
-import com.example.matchinggame.game.PreGameCountdown;
-import com.example.matchinggame.game.SoundLibrary;
-
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 
 import java.io.File;
 import java.util.ArrayList;
@@ -57,28 +33,31 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class GameActivity extends AppCompatActivity {
+public class TempGameActivity extends AppCompatActivity {
 
-
-    private GameTimer timerText;
-    private TextView timerText;
-    private TextView numberOfMatchesTextView;
-    private Button stopStartButton;
-    private Button resetButton;
-    private GridView gridView;
+    TextView timerText;
+    TextView numberOfMatchesTextView;
+    Button stopStartButton;
+    Button resetButton;
+    GridView gridView;
     private int countPair = 0;
-    private Timer timerback = new Timer();
-    private AnimatorSet set;
+    Timer timerback = new Timer();
+    Timer timer;
+    TimerTask timerTask;
+    Double time= 0.0;
+    AnimatorSet set;
     boolean timerStarted =false;
-    private TextView mTextField;
-    private Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
-    private ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
-    private ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
-    private ArrayList<Drawable> answerDrawable = new ArrayList<>();
-    private ArrayList<Integer> chosenPosition = new ArrayList<>();
-    private Handler mainHandler;
-    private Runnable myRunnable;
-    private SoundLibrary sounds;
+    TextView mTextField;
+    Integer[] answer = {0,0,1,1,2,2,3,3,4,4,5,5}; //to be shuffled on create
+    ArrayList<Integer> chosenImagesArr = new ArrayList<>(); //from intent
+    ArrayList<Drawable> chosenImagesDrawable = new ArrayList<>();
+    ArrayList<Drawable> answerDrawable = new ArrayList<>();
+    ArrayList<Integer> chosenPosition = new ArrayList<>();
+    Handler mainHandler;
+    Runnable myRunnable;
+    SoundPool soundPool;
+    int correct, wrong, countdown;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +78,7 @@ public class GameActivity extends AppCompatActivity {
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
             File file = new File(directory, "image"+(chosenImagesArr.get(i)+1)+".jpg");
+//            chosenImages.add( ( (BitmapDrawable)Drawable.createFromPath( file.toString() ) ).getBitmap());
             chosenImagesDrawable.add(Drawable.createFromPath( file.toString() ));
         }
 
@@ -107,23 +87,40 @@ public class GameActivity extends AppCompatActivity {
             answerDrawable.add(chosenImagesDrawable.get(answer[i]));
         }
 
-        sounds = new SoundLibrary(this);
+        AudioAttributes audioAttributes = new AudioAttributes
+        .Builder()
+        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+        .build();
+        soundPool = new SoundPool
+                .Builder()
+                .setMaxStreams(3)
+                .setAudioAttributes(audioAttributes)
+                .build();
+
+        correct
+                = soundPool.load(this, R.raw.correct,1);
+        wrong
+                = soundPool.load(this, R.raw.wrong, 1);
+        countdown
+                = soundPool.load(this, R.raw.countdown, 1);
 
         gridView = findViewById(R.id.GridView);
         ImageAdapter imageAdapter = new ImageAdapter(this);
         gridView.setAdapter(imageAdapter);
 
-        timerText =(GameTimer) findViewById(R.id.timerText);
+        timerText =(TextView) findViewById(R.id.timerText);
         stopStartButton=(Button)findViewById(R.id.startStopButton);
         resetButton=(Button)findViewById(R.id.restTapped);
+        timer = new Timer();
 
-        activateCountDown(sounds.soundPool);
+        activateCountDown(null);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //show image and set animation
-                ((ImageView)view).setBackground(answerDrawable.get(position));
+                ((ImageView)view).setImageDrawable(answerDrawable.get(position));
                 set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
                 set.setTarget((ImageView) view);
                 set.start();
@@ -150,15 +147,15 @@ public class GameActivity extends AppCompatActivity {
                     chosenPosition.add(position);
 
                     //to cover case where 3rd item is one of the first 2 items
-                    ((ImageView)view).setBackground(answerDrawable.get(position));
-
+                    ((ImageView)view).setImageDrawable(answerDrawable.get(position));
                 }
 
                 //if clicked second item
                 if (chosenPosition.size() == 2){
                     //compare if match
                     if (answer[chosenPosition.get(0)] == answer[chosenPosition.get(1)]){
-                        sounds.play(sounds.correct); // correct sound
+                        soundPool.play(correct, 1, 1, 0, 0, 1); // correct sound
+                        soundPool.pause(correct);
 
                         //make first item not clickable
                         ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
@@ -184,7 +181,8 @@ public class GameActivity extends AppCompatActivity {
                             }
                         };
                         Toast.makeText(getApplicationContext(),"No Match",Toast.LENGTH_SHORT).show();
-                        sounds.play(sounds.wrong);
+                        soundPool.play(wrong,1,1,0,0,1); // wrong sound
+                        soundPool.pause(wrong);
                         autoClose(parent, mainHandler);
                     }
                 }
@@ -195,7 +193,7 @@ public class GameActivity extends AppCompatActivity {
                     if(timerStarted == true){
                         stopStartButton.setEnabled(false);
                         resetButton.setEnabled(false);
-                        timerText.stop();
+                        timerTask.cancel();
                     }
                     TimerTask task = new TimerTask() {;
                         @Override
@@ -207,57 +205,35 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        timerTask.cancel();
-        setButtonUI("RESTART", R.color.green);
-    }
-    @Override
-    protected  void onRestart() {
-        super.onRestart();
-        startTimer();
-        setButtonUI("PAUSE", R.color.red);
-    }
-
-    private void winningCondition() {
-        Toast.makeText(getApplicationContext(),"You have Won!",Toast.LENGTH_SHORT).show();
-        if(timerStarted == true){
-            stopStartButton.setEnabled(false);
-            resetButton.setEnabled(false);
-            timerTask.cancel();
-        }
-        promptUser();
     }
 
     private void autoClose(AdapterView<?> parent, Handler mainHandler) {
-        mainHandler.postDelayed(myRunnable,2000);
+//        mainHandler.removeCallbacksAndMessages(null);
+        mainHandler.postDelayed(myRunnable,3000);
     }
 
-    private void activateCountDown(MediaPlayer count) {
+    private void activateCountDown(SoundPool soundPool) {
         //the countdown feature
         mTextField=findViewById(R.id.countdown);
-        PreGameCountdown countdownTimer = new PreGameCountdown();
-        countdownTimer.onTick(
-                millisUntilFinished -> {
-                    stopStartButton.setVisibility(View.INVISIBLE);
-                    soundPool.play(sounds.countdown,1,1,0,0,1);
-                    gridView.setEnabled(false);
-                    if((millisUntilFinished)<1000){
-                        mTextField.setText("START");
-                        sounds.soundPool.pause(sounds.countdown);
-                    }else{
-                        mTextField.setText(""+(millisUntilFinished) / 1000);
-                    }
+        new CountDownTimer(4000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                stopStartButton.setVisibility(View.INVISIBLE);
+                soundPool.play(countdown, 1,1,0,0,1);
+               gridView.setEnabled(false);
+                if((millisUntilFinished)<1000){
+                    mTextField.setText("START");
+                    soundPool.pause(countdown);
+                }else{
+                    mTextField.setText(""+(millisUntilFinished) / 1000);
                 }
-        ).onFinish(()-> {
-            startStopTapped(findViewById(R.id.startStopButton));
-            mTextField.setVisibility(View.GONE);
-        }).start();
+            }
+
+            public void onFinish() {
+                startStopTapped(findViewById(R.id.startStopButton));
+                mTextField.setVisibility(View.GONE);
+            }
+        }.start();
     }
 
     //to shuffle the answer
@@ -267,6 +243,10 @@ public class GameActivity extends AppCompatActivity {
         return intList.toArray(intArray);
     }
 
+    public void back(View view){
+        Intent intent = new Intent(this, TempMainActivity.class);
+        startActivity(intent);
+    }
 
     public void resetTapped(View view){
         AlertDialog.Builder resetAlert = new AlertDialog.Builder(this);
@@ -275,12 +255,11 @@ public class GameActivity extends AppCompatActivity {
         resetAlert.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
-                if(timerText.tsk != null){
+                if(timerTask != null){
                     Intent intentfrom1= getIntent();
                     intentfrom1.putIntegerArrayListExtra("chosenimage",intentfrom1.getIntegerArrayListExtra("chosenimage"));
                     recreate();
                 }
-
             }
         });
         resetAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -289,9 +268,7 @@ public class GameActivity extends AppCompatActivity {
                 //do nothing
             }
         });
-
         resetAlert.show();
-
     }
 
     public void startStopTapped(View view) {
@@ -304,9 +281,9 @@ public class GameActivity extends AppCompatActivity {
         }
         else{
             timerStarted =false;
-            setButtonUI("RESTART", R.color.green);
+            setButtonUI("RESUME", R.color.green);
             gridView.setEnabled(false);
-            timerText.stop();
+            timerTask.cancel();
         }
     }
 
@@ -315,97 +292,53 @@ public class GameActivity extends AppCompatActivity {
         stopStartButton.setTextColor(ContextCompat.getColor(this, color));
     }
 
-    public void promptUser(){
-        LayoutInflater li = LayoutInflater.from(this);
-        View promptView=li.inflate(R.layout.prompt,null);
-        AlertDialog.Builder dlg=new AlertDialog.Builder(this);
-        dlg.setView(promptView);
-        EditText input= promptView.findViewById(R.id.nameinput);
-        dlg.setCancelable(false)
-                .setPositiveButton("submit", new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dlg,int which){
-                        String name=input.getText().toString();
-                        String time=timerText.getText().toString();
-                        sendTheScore(name,time);
-                        TimerTask task = new TimerTask() {;
-                            @Override
-                            public void run() {
-                                finish();
-                            }
-                        };
-                        timerback.schedule(task, 1000 * 3);
-
-            }
-        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-
-            }
-        });
-        dlg.create().show();
-
-    }
-
-
     private void startTimer() {
         stopStartButton.setVisibility(View.VISIBLE);
-        runOnUiThread(timerText);
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        time++;
+                        timerText.setText(getTimerText());
+                    }
+                });
+            }
+        };
+        timer.scheduleAtFixedRate(timerTask,0,1000);
     }
 
-    public void sendTheScore(String name,String time){
-// Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(this);
-        int min=Integer.valueOf(time.split(":")[1].trim());
-        int sec=Integer.valueOf(time.split(":")[2].trim());
-        String url="http://10.0.2.2:8080/api/leaderboard/player?name="+name+"&min="+min+"&sec="+sec;
-        System.out.println(url);
+    private String getTimerText()
+    {
+        int rounded =(int) Math.round(time);
 
-// Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
+        int seconds =((rounded%86400)%3600)%60;
+        int minutes =((rounded%86400)%3600)/60;
+        int hours =((rounded%86400)/3600);
 
-                        System.out.println("Response is: "+ response.toString());
-                        try {
-                            JSONObject result= new JSONObject(response.toString());
-                            Toast.makeText(GameActivity.this,"Saved successfully",Toast.LENGTH_SHORT).show();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+        return formatTime(seconds,minutes,hours);
+    }
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                System.out.println(error.getMessage());
-                Toast.makeText(GameActivity.this,"Saving is failed!",Toast.LENGTH_SHORT).show();
-            }
-        });
-
-// Add the request to the RequestQueue.
-        queue.add(stringRequest);
+    private String formatTime(int seconds, int minutes, int hours)
+    {
+        return String.format("%02d",hours)+" : "+ String.format("%02d",minutes)+" : "+ String.format("%02d",seconds);
     }
 
     public void closeTwoCards(AdapterView<?> parent){
         //flip back first item
         ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
-        //firstItem.setImageDrawable(getDrawable(R.drawable.card));
-        firstItem.setBackgroundResource(R.drawable.card);
+        firstItem.setImageDrawable(getDrawable(R.drawable.card));
 
         //flip back 2nd item
         ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
-        //secondItem.setImageDrawable(getDrawable(R.drawable.card));
-        secondItem.setBackgroundResource(R.drawable.card);
+        secondItem.setImageDrawable(getDrawable(R.drawable.card));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sounds.release();
+        soundPool.release();
         getDelegate().onDestroy();
     }
 }

@@ -20,6 +20,7 @@ public class ImageAdapter extends BaseAdapter {
 
     }
 
+
     @Override
     public int getCount() {
         return 12;
@@ -45,11 +46,13 @@ public class ImageAdapter extends BaseAdapter {
             imageView = new ImageView(this.context);
             imageView.setLayoutParams(new GridView.LayoutParams(250,280));
 
+
         }
 
         else imageView = (ImageView)convertView;
 
-        imageView.setImageResource(R.drawable.card);
+        imageView.setBackgroundResource(R.drawable.card);
+
 
         return imageView;
     }
