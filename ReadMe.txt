@@ -11,13 +11,21 @@ Kevin Aditya:
 - countdown function before the game starts
 - score board implementation integrated with SpringBoot Backend Server
 
-
 Wang Dongyang:
 - URL input to fetch images
 - URL validation
 
 Low Huai Zhong:
-
+- retrieve intent extra of selected images array
+- prepare an answer array and shuffle it
+- prepare respective drawables for answer array
+- show respective drawables when onItemClick
+- set up game logic (e.g. match/mismatch)
+- implement feature to close first 2 chosen card immediately when 3rd card is chosen
+- fix bug when 3rd card chosen is one of the first 2
+- implement feature to auto close first 2 chosen card after 3seconds delay using postdelay on main handler
+- fixed bug where auto close feature closes wrong cards using removeCallbacksAndMessages
+- implemented number of matches textView
 
 Huan Xinyue:
 - timer function (start.pause,restart,reset)
