@@ -199,7 +199,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         timerTask.cancel();
-        setButtonUI("RESTART", R.color.green);
+        setButtonUI("RESUME", R.color.green);
     }
     @Override
     protected  void onRestart() {

@@ -33,7 +33,7 @@ Low Huai Zhong:
 - implemented number of matches textView
 
 Huan Xinyue:
-- timer function (start.pause,restart,reset)
+- timer function (start, pause, resume, reset)
 - reset the game function
 - show the selected 12 images through grid view
 - modify all layouts
