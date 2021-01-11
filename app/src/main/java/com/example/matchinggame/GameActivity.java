@@ -110,7 +110,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //show image and set animation
-                ((ImageView)view).setImageDrawable(answerDrawable.get(position));
+                ((ImageView)view).setBackground(answerDrawable.get(position));
                 set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(), R.animator.flip);
                 set.setTarget((ImageView) view);
                 set.start();
@@ -137,7 +137,7 @@ public class GameActivity extends AppCompatActivity {
                     chosenPosition.add(position);
 
                     //to cover case where 3rd item is one of the first 2 items
-                    ((ImageView)view).setImageDrawable(answerDrawable.get(position));
+                    ((ImageView)view).setBackground(answerDrawable.get(position));
                 }
 
                 //if clicked second item
@@ -286,11 +286,11 @@ public class GameActivity extends AppCompatActivity {
     public void closeTwoCards(AdapterView<?> parent){
         //flip back first item
         ImageView firstItem = (ImageView) parent.getChildAt(chosenPosition.get(0));
-        firstItem.setImageDrawable(getDrawable(R.drawable.card));
+        firstItem.setBackgroundResource(R.drawable.card);
 
         //flip back 2nd item
         ImageView secondItem = (ImageView) parent.getChildAt(chosenPosition.get(1));
-        secondItem.setImageDrawable(getDrawable(R.drawable.card));
+        secondItem.setBackgroundResource(R.drawable.card);
     }
 
     @Override
