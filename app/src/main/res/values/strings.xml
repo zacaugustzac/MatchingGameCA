@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MatchingGame</string>
+    <string name="app_name">Team 3 Android CA</string>
     <string name="fetchhint">https://stocksnap.io/search/</string>
     <string name="fetch">Fetch</string>
     <string name="progressmessage">Downloading 0 of 20 msg...</string>

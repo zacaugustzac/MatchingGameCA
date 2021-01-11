@@ -289,7 +289,7 @@ public class GameActivity extends AppCompatActivity {
         }
         else{
             timerStarted =false;
-            setButtonUI("RESTART", R.color.green);
+            setButtonUI("RESUME", R.color.green);
             gridView.setEnabled(false);
             timerTask.cancel();
         }
