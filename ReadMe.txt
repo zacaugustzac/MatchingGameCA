@@ -1,3 +1,8 @@
+Library added:
+- com.android.Volley for handling get request to backend server
+
+
+Contribution
 Gao Keqian:
 - Select 6 images (onClick, select image, if image already selected, click to deselect)
 - Show 20 images in gridView layout
@@ -33,6 +38,8 @@ Huan Xinyue:
 - show the selected 12 images through grid view
 - modify all layouts
 
+Sharon Chien:
+
 Li Rang:
 - flipping animation, matching and mismatching sound effects
 - set cards unclickable after pausing the game and clickable after restarting
@@ -42,9 +49,8 @@ Li Rang:
 
 
 
-Sharon Chien:
 
-Library added:
-- com.android.Volley for handling get request to backend server
+
+
 
 
